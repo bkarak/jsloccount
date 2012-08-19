@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="jsloccount" default="release">
+	<description>
+		JSLoCCount - Calculate size metrics for various languages
+        Vassilios Karakoidas (vassilios.karakoidas@gmail.com) - http://bkarak.wizhut.com/        
+	</description>
+	
+	<!-- Property Declaration -->
+	<property name="build" location="${basedir}/build"/>
+	<property name="src" location="${basedir}/src"/>
+    
+	<!-- Compile and produce jar -->
+	<target name="release">
+		<echo>Compiling JSLoCCount ...</echo>
+		<mkdir dir="${build}" />
+		<javac srcdir="${src}" destdir="${build}" source="1.6" target="1.6" debug="off" optimize="on" />
+		<jar basedir="${build}" destfile="${basedir}/jsloccount.jar" manifest="${src}/Manifest" />
+	</target>
+	
+	<target name="clean">
+		<echo>Cleaning the mess ...</echo>
+		<delete file="${basedir}/jsloccount.jar" />
+		<delete>
+			<fileset dir="${build}" includes="**/*"/>
+		</delete>
+	</target>
+</project>
