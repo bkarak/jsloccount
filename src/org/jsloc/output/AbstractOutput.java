@@ -63,6 +63,6 @@ class ResourceValue implements Comparator<ResourceValue> {
 
     @Override
     public int compare(ResourceValue lvalone, ResourceValue lvaltwo) {
-        return (new Long(lvaltwo.value)).compareTo(new Long(lvalone.value));
+        return (new Long(lvaltwo.value)).compareTo(lvalone.value);
     }
 }
