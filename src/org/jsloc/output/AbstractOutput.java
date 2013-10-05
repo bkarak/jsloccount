@@ -20,12 +20,12 @@ public abstract class AbstractOutput {
      
     protected AbstractOutput(ProjectStatistics ps) {
         this.projectStatistics = ps;
-        Resource[] langs = ps.getResources();
+        Resource[] resources = ps.getResources();
         
         // sort by loc 
         sortedLoC = new ArrayList<ResourceValue>();
         sortedFiles = new ArrayList<ResourceValue>();
-        for ( Resource r : langs ) {
+        for ( Resource r : resources ) {
             if(r.isText()) {
                 sortedLoC.add(new ResourceValue(r, ps.getLOC(r)));
             }
