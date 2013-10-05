@@ -49,6 +49,7 @@ public class StandardOutput extends AbstractOutput{
             File f = new File(filename);
             FileWriter fw = new FileWriter(filename, false);
             fw.write(strbld.toString());
+            fw.close();
             System.out.println(filename + " created!");
         } catch (IOException ioe) {
             System.out.println("Failed to create ... " + filename);
