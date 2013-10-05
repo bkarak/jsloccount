@@ -32,6 +32,7 @@ public class ProjectStatistics {
                 
                 Resource l = Resource.detect(f.getAbsolutePath());
                 LanguageStatistics ls = null;
+
                 if(stats.containsKey(l)) {
                     ls = stats.get(l);
                 } else {
