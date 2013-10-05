@@ -10,6 +10,44 @@ Typical usage involves the execution of the following command:
 
 java -jar jsloccount.jar <directory>
 
+Eat Your Own dogfood
+====================
+
+For example, a quick run of jsloccount on its own source directory will produce the following results:
+
+<pre>
+Number of Files:
+
+Java Compiled Class File, 14 / 30
+Java, 11 / 30
+JAR, 1 / 30
+ANT Build File, 1 / 30
+Other, 3 / 30
+
+Number of Lines (comments):
+
+Java, 544 (89)
+ANT Build File, 24 (2)
+</pre>
+
+and two output files, one with the file statistics:
+
+<pre>
+Resource Type,File Count,Total File Count
+Java Compiled Class File,14,30
+Java,11,30
+JAR,1,30
+ANT Build File,1,30
+</pre>
+
+and one with the size metrics:
+
+<pre>
+Resource Type,Source Lines of Code,Comments Lines of Code
+Java,544,89
+ANT Build File,24,2
+</pre>
+
 Supported Languages
 ===================
 
