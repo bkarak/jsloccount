@@ -30,14 +30,14 @@ public class StandardOutput extends AbstractOutput{
         for ( ResourceValue lv : sortedFiles ) {
             if (lv.getResource() == Resource.OTHER) { continue; }
             System.out.println(lv.getResource().getName() + ", " + lv.getValue() + " / " + totalFiles);
-            fileStatistics.append(lv.getResource().getName()).append(", ").append(lv.getValue()).append(",").append(totalFiles).append("\n");
+            fileStatistics.append(lv.getResource().getName()).append(",").append(lv.getValue()).append(",").append(totalFiles).append("\n");
         }
         System.out.println(Resource.OTHER.getName() + ", " + this.projectStatistics.getFileCount(Resource.OTHER) + " / " + totalFiles);
         
         System.out.println("\nNumber of Lines (comments):\n");
         for ( ResourceValue lv : sortedLoC ) {
             System.out.println(lv.getResource().getName() + ", " + lv.getValue() + " (" + this.projectStatistics.getLOCOM(lv.getResource()) + ")");
-            sizeStatistics.append(lv.getResource().getName()).append(", ").append(lv.getValue()).append(",").append(this.projectStatistics.getLOCOM(lv.getResource())).append("\n");
+            sizeStatistics.append(lv.getResource().getName()).append(",").append(lv.getValue()).append(",").append(this.projectStatistics.getLOCOM(lv.getResource())).append("\n");
         }
 
         this.saveToFile(fileStatistics, this.projectStatistics.getProjectName() + "-filestats.csv");
