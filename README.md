@@ -1,16 +1,17 @@
 JSLoCCount - Java Source Line of Code Counter Tool
 ==================================================
 
-Calculate physical lines of code and other code-related size metrics for several languages. In addition, JSLoCCount provides standard file statistics according to file type.
+Calculate physical LoC (Lines of Code) and other code-related size metrics for several languages. In addition, JSLoCCount provides standard file statistics according to file type.
 
 Usage
 =====
 
-Typical usage involves the
+Typical usage involves the execution of the following command:
 
 java -jar jsloccount.jar <directory>
 
-Supported Languages:
+Supported Languages
+===================
 
 * ANT Build File ( *build.xml*, )
 * make ( *Makefile*, *.inc*, )

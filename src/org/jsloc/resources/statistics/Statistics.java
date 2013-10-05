@@ -18,7 +18,7 @@ import org.jsloc.resources.Resource;
  * @author Vassilios Karakoidas (vassilios.karakoidas@gmail.com)
  */
 public class Statistics {
-    private Resource lang;
+    private Resource resource;
 
     // statistics
     private long loc;
@@ -33,14 +33,14 @@ public class Statistics {
         SINGLE;
     }
     
-    public Statistics(File f, Resource lang) {
+    public Statistics(File f, Resource resource) {
         this.loc = 0;
         this.locom = 0;
         this.total = 0;
-        this.lang = lang;
+        this.resource = resource;
 
         // start the calculation
-        Marker[] markers = lang.getCommentMarkers();
+        Marker[] markers = resource.getCommentMarkers();
         
         List<Marker> single = new ArrayList<Marker>();
         List<Marker> complex = new ArrayList<Marker>();
@@ -140,6 +140,6 @@ public class Statistics {
     }
 
     public Resource getLanguage() {
-        return lang;
+        return resource;
     }
 }

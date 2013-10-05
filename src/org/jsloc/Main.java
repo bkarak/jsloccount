@@ -3,6 +3,7 @@ package org.jsloc;
 import java.io.File;
 
 import org.jsloc.logger.Logger;
+import org.jsloc.output.AbstractOutputFactory;
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.resources.Resource;
 
@@ -48,7 +49,7 @@ public class Main {
             File f = new File(args[0]);
             if(f.exists() && f.isDirectory()) {
                 ProjectStatistics ps = new ProjectStatistics(f);
-
+                AbstractOutputFactory.getStandardOutput(ps).produce();
             } else {
                 logger.error("ERROR: " + f.getAbsolutePath() + " is not a directory");
             }
