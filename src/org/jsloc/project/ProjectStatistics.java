@@ -26,12 +26,18 @@ public class ProjectStatistics {
     
     private void update(File d) {
         if(d.isDirectory()) {
-            for ( File f : d.listFiles() ) {
+            File[] fileList = d.listFiles();
+
+            if (fileList == null){
+                return;
+            }
+
+            for ( File f : fileList ) {
                 if (f.isHidden()) { continue; }
                 if (f.isDirectory()) { update(f); continue; }
                 
                 Resource l = Resource.detect(f.getAbsolutePath());
-                LanguageStatistics ls = null;
+                LanguageStatistics ls;
 
                 if(stats.containsKey(l)) {
                     ls = stats.get(l);
