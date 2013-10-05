@@ -35,12 +35,18 @@ public class Main {
             if(args[0].compareToIgnoreCase("-d") == 0) {
                 File f = new File(args[1]);
                 if(f.exists() && f.isDirectory()) {
-                    for ( File ff : f.listFiles() ) {
+                    File[] files = f.listFiles();
+                    if (files == null) {
+                        return;
+                    }
+
+                    for ( File ff : files ) {
                         if(ff.isDirectory()) {
                             main(new String[] { ff.getAbsolutePath() });
                         }
                     }
                 }
+
                 return;
             }
         }
