@@ -26,6 +26,9 @@ public class StandardOutput extends AbstractOutput{
         System.out.println("Number of Files:\n");
         long totalFiles = this.projectStatistics.getTotalFileCount();
         StringBuilder fileStatistics = new StringBuilder(), sizeStatistics = new StringBuilder();
+
+        fileStatistics.append("Resource Type,File Count,Total File Count\n");
+        sizeStatistics.append("Resource Type,Source Lines of Code,Comments Lines of Code\n");
        
         for ( ResourceValue lv : sortedFiles ) {
             if (lv.getResource() == Resource.OTHER) { continue; }
