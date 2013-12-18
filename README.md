@@ -54,6 +54,7 @@ Supported Languages
 * ANT Build File ( *build.xml*, )
 * make ( *Makefile*, *.inc*, )
 * Java ( *.java*, )
+* J% ( *.jmod*, )
 * C ( *.c*, )
 * C++ ( *.C*, *.cpp*, *.cxx*, *.cc*, )
 * C/C++/Obj-C Headers ( *.h*, *.hxx*, *.H*, )
