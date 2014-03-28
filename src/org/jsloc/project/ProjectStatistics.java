@@ -28,6 +28,7 @@ import java.io.File;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 import org.jsloc.resources.Resource;
@@ -43,7 +44,7 @@ public class ProjectStatistics {
     private String projectName;
     
     public ProjectStatistics(File d) {
-        this.stats = new HashMap<Resource, LanguageStatistics>();
+        this.stats = new HashMap<>();
         this.projectName = d.getName().trim();
         update(d);
     } 
@@ -132,6 +133,7 @@ public class ProjectStatistics {
     }
     
     public Resource[] getResources() {
-        return stats.keySet().toArray(new Resource[] {});
+        Set<Resource> resources = stats.keySet();
+        return resources.toArray(new Resource[resources.size()]);
     }
 } 

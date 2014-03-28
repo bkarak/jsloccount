@@ -47,14 +47,16 @@ public abstract class AbstractOutput {
         Resource[] resources = ps.getResources();
         
         // sort by loc 
-        sortedLoC = new ArrayList<ResourceValue>();
-        sortedFiles = new ArrayList<ResourceValue>();
+        sortedLoC = new ArrayList<>();
+        sortedFiles = new ArrayList<>();
+
         for ( Resource r : resources ) {
             if(r.isText()) {
                 sortedLoC.add(new ResourceValue(r, ps.getLOC(r)));
             }
             sortedFiles.add(new ResourceValue(r, ps.getFileCount(r)));
         }
+
         Collections.sort(sortedLoC, new ResourceValue());
         Collections.sort(sortedFiles, new ResourceValue());
     }

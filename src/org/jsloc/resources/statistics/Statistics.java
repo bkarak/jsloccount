@@ -36,6 +36,8 @@ import java.util.List;
 import org.jsloc.Configuration;
 import org.jsloc.resources.Resource;
 
+import static org.jsloc.Configuration.logError;
+
 /**
  * 
  * 
@@ -113,6 +115,7 @@ public class Statistics {
                         status = Status.CODE;
                         continue;
                     }
+
                     // Complex line markers
                     for ( Marker cm : complex ) {
                         int sIndex = line.indexOf(cm.getStartingMarker());
@@ -143,8 +146,7 @@ public class Statistics {
 
             br.close();
         } catch (IOException ioe) {
-            Configuration.getInstance().getLogger().error("ERROR: Cannot read file " + ioe.getMessage());
-            return;
+            logError("Cannot read file " + ioe.getMessage());
         }
     }
 

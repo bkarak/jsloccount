@@ -26,10 +26,11 @@ package org.jsloc;
 
 import java.io.File;
 
-import org.jsloc.logger.Logger;
 import org.jsloc.output.AbstractOutputFactory;
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.resources.Resource;
+
+import static org.jsloc.Configuration.logInfo;
 
 /**
  * 
@@ -40,21 +41,17 @@ import org.jsloc.resources.Resource;
 public class Main {
     
     private static void help() {
-        Logger logger = Configuration.getInstance().getLogger();
-        
-        logger.message("JSLoCcount - Vassilios Karakoidas (bkarak@aueb.gr)\n");
-        logger.message("usage:\n");
-        logger.message("java -jar jsloccount.jar <directory>\n");
-        
-        logger.message("Supported Languages:\n");
+        logInfo("JSLoCcount - Vassilios Karakoidas (bkarak@aueb.gr)\n");
+        logInfo("usage:\n");
+        logInfo("java -jar jsloccount.jar <directory>\n");
+
+        logInfo("Supported Languages:\n");
         for ( Resource r : Resource.values() ) {
-            logger.message("* " + r.toString());
+            logInfo("* " + r.toString());
         }        
     }
 
     public static void main(String[] args) {
-        Logger logger = Configuration.getInstance().getLogger();
-        
         if(args.length == 2) {
             if(args[0].compareToIgnoreCase("-d") == 0) {
                 File f = new File(args[1]);
@@ -81,7 +78,7 @@ public class Main {
                 ProjectStatistics ps = new ProjectStatistics(f);
                 AbstractOutputFactory.getStandardOutput(ps).produce();
             } else {
-                logger.error("ERROR: " + f.getAbsolutePath() + " is not a directory");
+                logInfo("ERROR: " + f.getAbsolutePath() + " is not a directory");
             }
             
             return;

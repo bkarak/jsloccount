@@ -24,8 +24,6 @@
 */
 package org.jsloc;
 
-import org.jsloc.logger.Logger;
-import org.jsloc.logger.NativeLogger;
 
 /**
  * 
@@ -34,19 +32,25 @@ import org.jsloc.logger.NativeLogger;
  */
 public class Configuration {
     private final static Configuration defaultInstance;
-    //
-    private Logger logger;
-    
+
     static {
         defaultInstance = new Configuration();
     }
     
     public Configuration() {
-        this.logger = new NativeLogger();
+
     }
-    
-    public Logger getLogger() {
-        return logger;
+
+    public static void logError(String msg) {
+        System.out.println("[ERROR] " + msg);
+    }
+
+    public static void logInfo(String msg) {
+        System.out.println("[INFO] " + msg);
+    }
+
+    public static void logWarn(String msg) {
+        System.out.println("[WARN] " + msg);
     }
     
     public static Configuration getInstance() {
