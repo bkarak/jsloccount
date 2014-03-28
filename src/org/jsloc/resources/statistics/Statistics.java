@@ -48,26 +48,23 @@ public class Statistics {
     private long loc;
     private long total;
     private long locom;
+    private List<Long> lineCount;
     
     // Private Enumeration, used to indicate the status of the parser
-    private enum Status {
-        CODE,
-        COMMENT,
-        BOTH,
-        SINGLE;
-    }
+    private enum Status { CODE, COMMENT, BOTH, SINGLE }
     
     public Statistics(File f, Resource resource) {
         this.loc = 0;
         this.locom = 0;
         this.total = 0;
         this.resource = resource;
+        this.lineCount = new ArrayList<>();
 
         // start the calculation
         Marker[] markers = resource.getCommentMarkers();
         
-        List<Marker> single = new ArrayList<Marker>();
-        List<Marker> complex = new ArrayList<Marker>();
+        List<Marker> single = new ArrayList<>();
+        List<Marker> complex = new ArrayList<>();
         
         for ( Marker cm : markers ) {
             if(cm.isSingleCommentMarker()) {
@@ -162,6 +159,8 @@ public class Statistics {
     public long getTotalLines() {
         return total;
     }
+
+    public Long[] getLineCount() { return this.lineCount.toArray(new Long[this.lineCount.size()]); }
 
     public Resource getLanguage() {
         return resource;
