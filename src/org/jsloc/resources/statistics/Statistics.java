@@ -50,6 +50,7 @@ public class Statistics {
     private long totalLinesOfCode;
     private long linesOfCommentCode;
     private long characterCount;
+    private long totalCharacterCount;
 
     // Private Enumeration, used to indicate the status of the parser
     private enum Status { CODE, COMMENT, BOTH, SINGLE }
@@ -59,6 +60,8 @@ public class Statistics {
         this.linesOfCommentCode = 0;
         this.totalLinesOfCode = 0;
         this.resource = resource;
+        this.characterCount = 0;
+        this.totalCharacterCount = 0;
 
         // start the calculation
         Marker[] markers = resource.getCommentMarkers();
@@ -160,7 +163,9 @@ public class Statistics {
         return totalLinesOfCode;
     }
 
-    public long characterCount() { return characterCount; }
+    public long getCharacterCount() { return characterCount; }
+
+    public long getTotalCharacterCount() { return totalCharacterCount; }
 
     public Resource getLanguage() {
         return resource;
