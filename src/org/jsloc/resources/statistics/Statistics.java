@@ -33,7 +33,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jsloc.Configuration;
 import org.jsloc.resources.Resource;
 
 import static org.jsloc.Configuration.logError;
@@ -47,20 +46,19 @@ public class Statistics {
     private Resource resource;
 
     // statistics
-    private long loc;
-    private long total;
-    private long locom;
-    private List<Long> lineCount;
-    
+    private long linesOfCode;
+    private long totalLinesOfCode;
+    private long linesOfCommentCode;
+    private long characterCount;
+
     // Private Enumeration, used to indicate the status of the parser
     private enum Status { CODE, COMMENT, BOTH, SINGLE }
     
     public Statistics(File f, Resource resource) {
-        this.loc = 0;
-        this.locom = 0;
-        this.total = 0;
+        this.linesOfCode = 0;
+        this.linesOfCommentCode = 0;
+        this.totalLinesOfCode = 0;
         this.resource = resource;
-        this.lineCount = new ArrayList<>();
 
         // start the calculation
         Marker[] markers = resource.getCommentMarkers();
@@ -87,7 +85,7 @@ public class Statistics {
                 int lineLen = line.length();
 
                 // increase the total line, this includes the empty lines
-                total++;
+                totalLinesOfCode++;
                 
                 // if the line is empty, then continue
                 if (lineLen == 0) { continue; }                
@@ -108,9 +106,9 @@ public class Statistics {
                     }
                     
                     if(status == Status.SINGLE || status == Status.BOTH) {
-                        locom++;
+                        linesOfCommentCode++;
                         if(status == Status.BOTH) {
-                            loc++;
+                            linesOfCode++;
                         }                        
                         status = Status.CODE;
                         continue;
@@ -123,7 +121,7 @@ public class Statistics {
                         if (sIndex < 0) { continue; }
 
                         if (sIndex > 0) {
-                            loc++;
+                            linesOfCode++;
                         }                        
                         status = Status.COMMENT;
                         cur = cm;
@@ -131,17 +129,17 @@ public class Statistics {
                     }
                 } 
                 if (status == Status.COMMENT) {
-                    locom++;
+                    linesOfCommentCode++;
                     
                     int sIndex = line.indexOf(cur.getEndingMarker());
                     if(sIndex < 0) { continue; }
                     if(sIndex > 0) {
-                        loc++;
+                        linesOfCode++;
                     }
                     status = Status.CODE;
                     continue;
                 }
-                loc++;
+                linesOfCode++;
             }
 
             br.close();
@@ -151,18 +149,18 @@ public class Statistics {
     }
 
     public long getLOC() {
-        return loc;
+        return linesOfCode;
     }
 
     public long getLOCOM() {
-        return locom;
+        return linesOfCommentCode;
     }
 
     public long getTotalLines() {
-        return total;
+        return totalLinesOfCode;
     }
 
-    public Long[] getLineCount() { return this.lineCount.toArray(new Long[this.lineCount.size()]); }
+    public long characterCount() { return characterCount; }
 
     public Resource getLanguage() {
         return resource;
