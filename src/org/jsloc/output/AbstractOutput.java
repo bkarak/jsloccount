@@ -26,10 +26,9 @@ package org.jsloc.output;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import org.jsloc.project.ProjectStatistics;
-import org.jsloc.resources.Resource;
+import org.jsloc.project.Resource;
 
 /**
  *

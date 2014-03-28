@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 
-import org.jsloc.resources.Resource;
 import org.jsloc.resources.statistics.Statistics;
 
 /**

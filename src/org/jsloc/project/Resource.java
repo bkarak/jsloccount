@@ -22,7 +22,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.jsloc.resources;
+package org.jsloc.project;
 
 import org.jsloc.resources.statistics.Marker;
 
@@ -142,7 +142,7 @@ public enum Resource {
     // simple getters
     
     public Marker[] getCommentMarkers() { return markers; }
-    
+
     public String[] getExtensions() { return extensions; }
     
     public String getName() { return name; }

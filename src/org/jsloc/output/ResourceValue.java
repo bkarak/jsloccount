@@ -1,6 +1,6 @@
 package org.jsloc.output;
 
-import org.jsloc.resources.Resource;
+import org.jsloc.project.Resource;
 
 import java.util.Comparator;
 

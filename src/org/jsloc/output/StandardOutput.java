@@ -25,13 +25,10 @@
 package org.jsloc.output;
 
 import org.jsloc.project.ProjectStatistics;
-import org.jsloc.resources.Resource;
+import org.jsloc.project.Resource;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.logging.Logger;
 
 import static org.jsloc.Configuration.logError;
 import static org.jsloc.Configuration.logInfo;

@@ -28,7 +28,7 @@ import java.io.File;
 
 import org.jsloc.output.AbstractOutputFactory;
 import org.jsloc.project.ProjectStatistics;
-import org.jsloc.resources.Resource;
+import org.jsloc.project.Resource;
 
 import static org.jsloc.Configuration.logInfo;
 

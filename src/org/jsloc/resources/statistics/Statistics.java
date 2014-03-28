@@ -33,7 +33,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jsloc.resources.Resource;
+import org.jsloc.project.Resource;
 
 import static org.jsloc.Configuration.logError;
 
@@ -50,6 +50,7 @@ public class Statistics {
     private long totalLinesOfCode;
     private long linesOfCommentCode;
     private long characterCount;
+    private long commentCharacterCount;
     private long totalCharacterCount;
 
     // Private Enumeration, used to indicate the status of the parser
@@ -62,6 +63,7 @@ public class Statistics {
         this.resource = resource;
         this.characterCount = 0;
         this.totalCharacterCount = 0;
+        this.commentCharacterCount = 0;
 
         // start the calculation
         Marker[] markers = resource.getCommentMarkers();
@@ -166,6 +168,8 @@ public class Statistics {
     public long getCharacterCount() { return characterCount; }
 
     public long getTotalCharacterCount() { return totalCharacterCount; }
+
+    public long getCommentCharacterCount() { return commentCharacterCount; }
 
     public Resource getLanguage() {
         return resource;
