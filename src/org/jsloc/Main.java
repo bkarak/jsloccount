@@ -76,7 +76,7 @@ public class Main {
             File f = new File(args[0]);
             if(f.exists() && f.isDirectory()) {
                 ProjectStatistics ps = new ProjectStatistics(f);
-                AbstractOutputFactory.getStandardOutput(ps).produce();
+                AbstractOutputFactory.getFileOutput(ps).produce();
             } else {
                 logInfo("ERROR: " + f.getAbsolutePath() + " is not a directory");
             }

@@ -49,7 +49,7 @@ public class Statistics {
     private long linesOfCode;
     private long totalLinesOfCode;
     private long linesOfCommentCode;
-    private long characterCount;
+    private long codeCharacterCount;
     private long commentCharacterCount;
     private long totalCharacterCount;
 
@@ -61,7 +61,7 @@ public class Statistics {
         this.linesOfCommentCode = 0;
         this.totalLinesOfCode = 0;
         this.resource = resource;
-        this.characterCount = 0;
+        this.codeCharacterCount = 0;
         this.totalCharacterCount = 0;
         this.commentCharacterCount = 0;
 
@@ -92,8 +92,11 @@ public class Statistics {
                 // increase the total line, this includes the empty lines
                 totalLinesOfCode++;
                 
-                // if the line is empty, then continue
-                if (lineLen == 0) { continue; }                
+                // if the line is empty, then continue to the next one
+                if (lineLen == 0) { continue; }
+
+                // add to total character count
+                totalCharacterCount += lineLen;
                 
                 if(status == Status.CODE) {
                     // Single line markers
@@ -103,15 +106,19 @@ public class Statistics {
                         
                         if (sIndex > 0) {
                             status = Status.BOTH;
+                            this.codeCharacterCount += sIndex;
+                            this.commentCharacterCount += (lineLen - sIndex);
                             break;
                         } else if (sIndex == 0) {
                             status = Status.SINGLE;
+                            this.codeCharacterCount += lineLen;
                             break;
                         }
                     }
                     
                     if(status == Status.SINGLE || status == Status.BOTH) {
                         linesOfCommentCode++;
+
                         if(status == Status.BOTH) {
                             linesOfCode++;
                         }                        
@@ -125,9 +132,16 @@ public class Statistics {
                         
                         if (sIndex < 0) { continue; }
 
+                        if (sIndex == 0) {
+                            this.commentCharacterCount += lineLen;
+                        }
+
                         if (sIndex > 0) {
                             linesOfCode++;
-                        }                        
+                            this.codeCharacterCount += sIndex;
+                            this.commentCharacterCount += (lineLen - sIndex);
+                        }
+
                         status = Status.COMMENT;
                         cur = cm;
                         break;
@@ -137,7 +151,10 @@ public class Statistics {
                     linesOfCommentCode++;
                     
                     int sIndex = line.indexOf(cur.getEndingMarker());
-                    if(sIndex < 0) { continue; }
+                    if(sIndex < 0) {
+                        this.commentCharacterCount += lineLen;
+                        continue;
+                    }
                     if(sIndex > 0) {
                         linesOfCode++;
                     }
@@ -165,7 +182,7 @@ public class Statistics {
         return totalLinesOfCode;
     }
 
-    public long getCharacterCount() { return characterCount; }
+    public long getCodeCharacterCount() { return codeCharacterCount; }
 
     public long getTotalCharacterCount() { return totalCharacterCount; }
 

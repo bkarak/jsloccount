@@ -39,9 +39,9 @@ import static org.jsloc.Configuration.logInfo;
  * @author Vassilios Karakoidas (bkarak@aueb.gr)
  *
  */
-public class StandardOutput extends AbstractOutput{
+public class FileOutput extends AbstractOutput{
     
-    public StandardOutput(ProjectStatistics ps) {
+    public FileOutput(ProjectStatistics ps) {
         super(ps);
     }
 
