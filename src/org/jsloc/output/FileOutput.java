@@ -49,21 +49,23 @@ public class FileOutput extends AbstractOutput{
 
     @Override
     public void produce() {        
-        long totalFiles = this.projectStatistics.getTotalFileCount();
         StringBuilder fileStatistics = new StringBuilder(),
                       sizeStatistics = new StringBuilder();
 
         fileStatistics.append("Resource Type,File Count,Total File Count\n");
-        sizeStatistics.append("Resource Type,Source Lines of Code,Comments Lines of Code\n");
        
-        for ( ResourceValue lv : sortedFiles ) {
+        for ( ResourceValue lv : this.getResourcesByLoc() ) {
             if (lv.getResource() == Resource.OTHER) { continue; }
 
-            List<String> values = Arrays.asList(lv.getResource().getName(), String.valueOf(lv.getValue()), String.valueOf(totalFiles));
+            List<String> values = Arrays.asList(lv.getResource().getName(),
+                                                String.valueOf(lv.getValue()),
+                                                String.valueOf(this.projectStatistics.getTotalFileCount()));
             fileStatistics.append(StringUtil.join(",", values)).append("\n");
         }
 
-        for ( ResourceValue lv : sortedLoC ) {
+        sizeStatistics.append("Resource Type,Source Lines of Code,Comments Lines of Code\n");
+
+        for ( ResourceValue lv : this.getResourcesByFiles() ) {
             List<String> values = Arrays.asList(lv.getResource().getName(),
                                                 String.valueOf(lv.getValue()),
                                                 String.valueOf(this.projectStatistics.getLOCOM(lv.getResource())));

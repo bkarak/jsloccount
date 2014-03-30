@@ -26,6 +26,7 @@ package org.jsloc.output;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.project.Resource;
@@ -38,8 +39,8 @@ import org.jsloc.project.Resource;
  */
 public abstract class AbstractOutput {
     protected ProjectStatistics projectStatistics;
-    protected ArrayList<ResourceValue> sortedLoC;
-    protected ArrayList<ResourceValue> sortedFiles;
+    private ArrayList<ResourceValue> sortedLoC;
+    private ArrayList<ResourceValue> sortedFiles;
      
     protected AbstractOutput(ProjectStatistics ps) {
         this.projectStatistics = ps;
@@ -53,12 +54,16 @@ public abstract class AbstractOutput {
             if(r.isText()) {
                 sortedLoC.add(new ResourceValue(r, ps.getLOC(r)));
             }
+
             sortedFiles.add(new ResourceValue(r, ps.getFileCount(r)));
         }
 
         Collections.sort(sortedLoC, new ResourceValue());
         Collections.sort(sortedFiles, new ResourceValue());
     }
+
+    public List<ResourceValue> getResourcesByLoc() { return Collections.unmodifiableList(sortedLoC); }
+    public List<ResourceValue> getResourcesByFiles() { return Collections.unmodifiableList(sortedFiles); }
     
     public abstract void produce();
 }
