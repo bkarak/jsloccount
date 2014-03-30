@@ -27,8 +27,8 @@ package org.jsloc.output;
 
 import org.jsloc.project.ProjectStatistics;
 
-public class AbstractOutputFactory {
+public class OutputFactory {
     public static AbstractOutput getFileOutput(ProjectStatistics ps) {
-        return (new FileOutput(ps));
+        return new FileOutput(ps);
     }
 }

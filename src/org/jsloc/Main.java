@@ -26,7 +26,7 @@ package org.jsloc;
 
 import java.io.File;
 
-import org.jsloc.output.AbstractOutputFactory;
+import org.jsloc.output.OutputFactory;
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.project.Resource;
 
@@ -76,7 +76,7 @@ public class Main {
             File f = new File(args[0]);
             if(f.exists() && f.isDirectory()) {
                 ProjectStatistics ps = new ProjectStatistics(f);
-                AbstractOutputFactory.getFileOutput(ps).produce();
+                OutputFactory.getFileOutput(ps).produce();
             } else {
                 logInfo("ERROR: " + f.getAbsolutePath() + " is not a directory");
             }
