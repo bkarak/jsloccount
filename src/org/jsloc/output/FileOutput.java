@@ -43,7 +43,6 @@ import static org.jsloc.Configuration.logInfo;
  *
  */
 public class FileOutput extends AbstractOutput{
-    
     public FileOutput(ProjectStatistics ps) {
         super(ps);
     }
@@ -51,7 +50,8 @@ public class FileOutput extends AbstractOutput{
     @Override
     public void produce() {        
         long totalFiles = this.projectStatistics.getTotalFileCount();
-        StringBuilder fileStatistics = new StringBuilder(), sizeStatistics = new StringBuilder();
+        StringBuilder fileStatistics = new StringBuilder(),
+                      sizeStatistics = new StringBuilder();
 
         fileStatistics.append("Resource Type,File Count,Total File Count\n");
         sizeStatistics.append("Resource Type,Source Lines of Code,Comments Lines of Code\n");
