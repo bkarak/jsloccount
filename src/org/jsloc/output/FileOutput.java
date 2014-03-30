@@ -24,11 +24,14 @@
 */
 package org.jsloc.output;
 
+import org.jsloc.StringUtil;
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.project.Resource;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.jsloc.Configuration.logError;
 import static org.jsloc.Configuration.logInfo;
@@ -55,11 +58,16 @@ public class FileOutput extends AbstractOutput{
        
         for ( ResourceValue lv : sortedFiles ) {
             if (lv.getResource() == Resource.OTHER) { continue; }
-            fileStatistics.append(lv.getResource().getName()).append(",").append(lv.getValue()).append(",").append(totalFiles).append("\n");
+
+            List<String> values = Arrays.asList(lv.getResource().getName(), String.valueOf(lv.getValue()), String.valueOf(totalFiles));
+            fileStatistics.append(StringUtil.join(",", values)).append("\n");
         }
 
         for ( ResourceValue lv : sortedLoC ) {
-            sizeStatistics.append(lv.getResource().getName()).append(",").append(lv.getValue()).append(",").append(this.projectStatistics.getLOCOM(lv.getResource())).append("\n");
+            List<String> values = Arrays.asList(lv.getResource().getName(),
+                                                String.valueOf(lv.getValue()),
+                                                String.valueOf(this.projectStatistics.getLOCOM(lv.getResource())));
+            sizeStatistics.append(StringUtil.join(",", values)).append("\n");
         }
 
         this.saveToFile(fileStatistics, this.projectStatistics.getProjectName() + "-filestats.csv");
