@@ -49,9 +49,6 @@ public class Statistics {
     private long linesOfCode;
     private long totalLinesOfCode;
     private long linesOfCommentCode;
-    private long codeCharacterCount;
-    private long commentCharacterCount;
-    private long totalCharacterCount;
 
     // Private Enumeration, used to indicate the status of the parser
     private enum Status { CODE, COMMENT, BOTH, SINGLE }
@@ -61,9 +58,6 @@ public class Statistics {
         this.linesOfCommentCode = 0;
         this.totalLinesOfCode = 0;
         this.resource = resource;
-        this.codeCharacterCount = 0;
-        this.totalCharacterCount = 0;
-        this.commentCharacterCount = 0;
 
         // start the calculation
         Marker[] markers = resource.getCommentMarkers();
@@ -95,9 +89,6 @@ public class Statistics {
                 // if the line is empty, then continue to the next one
                 if (lineLen == 0) { continue; }
 
-                // add to total character count
-                totalCharacterCount += lineLen;
-                
                 if(status == Status.CODE) {
                     // Single line markers
                     for ( Marker cm : single ) {
@@ -106,12 +97,9 @@ public class Statistics {
                         
                         if (sIndex > 0) {
                             status = Status.BOTH;
-                            this.codeCharacterCount += sIndex;
-                            this.commentCharacterCount += (lineLen - sIndex);
                             break;
                         } else if (sIndex == 0) {
                             status = Status.SINGLE;
-                            this.codeCharacterCount += lineLen;
                             break;
                         }
                     }
@@ -132,14 +120,8 @@ public class Statistics {
                         
                         if (sIndex < 0) { continue; }
 
-                        if (sIndex == 0) {
-                            this.commentCharacterCount += lineLen;
-                        }
-
                         if (sIndex > 0) {
                             linesOfCode++;
-                            this.codeCharacterCount += sIndex;
-                            this.commentCharacterCount += (lineLen - sIndex);
                         }
 
                         status = Status.COMMENT;
@@ -151,10 +133,6 @@ public class Statistics {
                     linesOfCommentCode++;
                     
                     int sIndex = line.indexOf(cur.getEndingMarker());
-                    if(sIndex < 0) {
-                        this.commentCharacterCount += lineLen;
-                        continue;
-                    }
                     if(sIndex > 0) {
                         linesOfCode++;
                     }
@@ -181,12 +159,6 @@ public class Statistics {
     public long getTotalLines() {
         return totalLinesOfCode;
     }
-
-    public long getCodeCharacterCount() { return codeCharacterCount; }
-
-    public long getTotalCharacterCount() { return totalCharacterCount; }
-
-    public long getCommentCharacterCount() { return commentCharacterCount; }
 
     public Resource getLanguage() {
         return resource;

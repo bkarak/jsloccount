@@ -38,6 +38,7 @@ public enum Resource {
     ANT(new Marker[] { new Marker("<!--", "-->") }, new String[] { "build.xml" }, "ANT Build File"),
     MAKE(new Marker[] { new Marker("#") }, new String[] { "Makefile", ".inc" }, "make"),
     // then the rest
+    HASKELL(new Marker[] { new Marker("--") }, new String[] { ".hs"}, "Haskell"),
     JMOD(new Marker[] {}, new String[] { ".jmod" }, "J%"),
     JAVA(new Marker[] { new Marker("//"), new Marker("/*", "*/"),  new Marker("/**", "*/") }, new String[] { ".java" }, "Java" ),
     C(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".c" }, "C" ),

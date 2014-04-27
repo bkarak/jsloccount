@@ -72,8 +72,10 @@ public class FileOutput extends AbstractOutput{
             sizeStatistics.append(StringUtil.join(",", values)).append("\n");
         }
 
-        this.saveToFile(fileStatistics, this.projectStatistics.getProjectName() + "-filestats.csv");
-        this.saveToFile(sizeStatistics, this.projectStatistics.getProjectName() + "-sizestats.csv");
+        String projectName = this.projectStatistics.getProjectName();
+
+        this.saveToFile(fileStatistics, projectName + "-filestats.csv");
+        this.saveToFile(sizeStatistics, projectName + "-sizestats.csv");
     }
 
     private void saveToFile(StringBuilder strbld, String filename) {
