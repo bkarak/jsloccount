@@ -6,3 +6,4 @@ build
 jsloccount.jar
 *.jsloccount
 *.csv
+jsloccount.iml
