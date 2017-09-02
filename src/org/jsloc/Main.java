@@ -52,26 +52,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        if(args.length == 2) {
-            if(args[0].compareToIgnoreCase("-d") == 0) {
-                File f = new File(args[1]);
-                if(f.exists() && f.isDirectory()) {
-                    File[] files = f.listFiles();
-                    if (files == null) {
-                        return;
-                    }
-
-                    for ( File ff : files ) {
-                        if(ff.isDirectory()) {
-                            main(new String[] { ff.getAbsolutePath() });
-                        }
-                    }
-                }
-
-                return;
-            }
-        }
-        
         if(args.length == 1) {        
             File f = new File(args[0]);
             if(f.exists() && f.isDirectory()) {
