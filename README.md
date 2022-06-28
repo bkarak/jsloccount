@@ -48,7 +48,7 @@ Java,544,89
 ANT Build File,24,2
 </pre>
 
-Supported Languages
+Supported Languages & Files types
 ===================
 
 * ANT Build File ( *build.xml*, )
