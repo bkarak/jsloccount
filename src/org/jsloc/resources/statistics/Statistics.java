@@ -43,7 +43,7 @@ import static org.jsloc.Configuration.logError;
  * @author Vassilios Karakoidas (vassilios.karakoidas@gmail.com)
  */
 public class Statistics {
-    private Resource resource;
+    private final Resource resource;
 
     // statistics
     private long linesOfCode;

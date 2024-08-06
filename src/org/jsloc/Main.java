@@ -48,7 +48,7 @@ public class Main {
         logInfo("Supported Languages:\n");
         for ( Resource r : Resource.values() ) {
             logInfo("* " + r.toString());
-        }        
+        }
     }
 
     public static void main(String[] args) {

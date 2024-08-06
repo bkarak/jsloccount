@@ -31,19 +31,16 @@ package org.jsloc.resources.statistics;
  *
  */
 public class Marker {
-    private String startingMarker;
-    private String endingMarker;
-    private boolean singleCommentMarker;
+    private final String startingMarker;
+    private final String endingMarker;
     
     public Marker(String scm, String ecm) {
         this.startingMarker = scm;
         this.endingMarker = ecm;
-        this.singleCommentMarker = false;
     }
     
     public Marker(String cm) {
         this(cm, cm);
-        this.singleCommentMarker = true;
     }
     
     public String getStartingMarker() {
@@ -55,6 +52,6 @@ public class Marker {
     }
     
     public boolean isSingleCommentMarker() {
-        return singleCommentMarker;
+        return startingMarker.contentEquals(this.endingMarker);
     }
 }
