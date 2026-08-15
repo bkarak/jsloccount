@@ -33,10 +33,12 @@ import java.util.Objects;
  * @param start       the text opening the comment
  * @param end         the text closing it, equal to {@code start} for a line comment
  * @param atLineStart whether the marker only opens a comment in column one
+ * @param nests       whether a second opening inside the comment must be closed
+ *                    before the comment ends, as Rust and Haskell require
  *
  * @author Vassilios Karakoidas (vassilios.karakoidas@gmail.com)
  */
-public record Marker(String start, String end, boolean atLineStart) {
+public record Marker(String start, String end, boolean atLineStart, boolean nests) {
 
     public Marker {
         Objects.requireNonNull(start, "start");
@@ -44,11 +46,11 @@ public record Marker(String start, String end, boolean atLineStart) {
     }
 
     public Marker(String start, String end) {
-        this(start, end, false);
+        this(start, end, false, false);
     }
 
     public Marker(String marker) {
-        this(marker, marker, false);
+        this(marker, marker, false, false);
     }
 
     /**
@@ -57,7 +59,16 @@ public record Marker(String start, String end, boolean atLineStart) {
      * else those characters are ordinary code.
      */
     public static Marker inColumnOne(String marker) {
-        return new Marker(marker, marker, true);
+        return new Marker(marker, marker, true, false);
+    }
+
+    /**
+     * A block comment that nests, so {@code /* a /* b *&#47; c *&#47;} is one comment
+     * rather than one that ended early. Most C-family languages do <em>not</em> nest;
+     * Rust, Swift, Scala, Kotlin, Dart, Haskell, OCaml, F# and Julia do.
+     */
+    public static Marker nesting(String start, String end) {
+        return new Marker(start, end, false, true);
     }
 
     public boolean isSingleLine() {

@@ -70,6 +70,8 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
         try (BufferedReader reader = newReader(file)) {
             // the block comment we are inside of, carried across lines; null when in code
             Marker openBlock = null;
+            // how many times it has been reopened, for the markers that nest
+            int depth = 0;
             // likewise the multi-line string literal we are inside of
             Quote openQuote = null;
             String raw;
@@ -99,10 +101,22 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                         holdsComment = true;
 
                         int end = line.indexOf(openBlock.end(), position);
+                        int reopen = openBlock.nests() ? line.indexOf(openBlock.start(), position) : -1;
+
+                        // a nested opening defers the close by one level
+                        if (reopen >= 0 && (end < 0 || reopen < end)) {
+                            depth++;
+                            position = reopen + openBlock.start().length();
+                            continue;
+                        }
+
                         if (end < 0) {
                             position = line.length();
-                        } else {
-                            position = end + openBlock.end().length();
+                            continue;
+                        }
+
+                        position = end + openBlock.end().length();
+                        if (--depth == 0) {
                             openBlock = null;
                         }
                         continue;
@@ -192,6 +206,7 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                         position = line.length();
                     } else {
                         openBlock = opening;
+                        depth = 1;
                         position = start + opening.start().length();
                     }
                 }
