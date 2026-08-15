@@ -42,7 +42,9 @@ import static org.jsloc.Configuration.logError;
  * Size metrics for a single text file.
  *
  * <p>A line is attributed to both counters when it carries code and a comment;
- * a block comment keeps claiming lines until its closing marker is reached.
+ * a block comment keeps claiming lines until its closing marker is reached. Comment
+ * markers found inside a string literal do not open a comment, so a line such as
+ * {@code char *url = "http://example.com";} is code alone.
  *
  * @param resource     the detected type of the counted file
  * @param sourceLines  lines holding code outside a comment
@@ -59,6 +61,7 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
      */
     public static Statistics count(Path file, Resource resource) {
         List<Marker> markers = resource.commentMarkers();
+        List<Quote> quotes = resource.stringQuotes();
 
         long sourceLines = 0;
         long commentLines = 0;
@@ -67,6 +70,8 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
         try (BufferedReader reader = newReader(file)) {
             // the block comment we are inside of, carried across lines; null when in code
             Marker openBlock = null;
+            // likewise the multi-line string literal we are inside of
+            Quote openQuote = null;
             String raw;
 
             while ((raw = reader.readLine()) != null) {
@@ -80,7 +85,7 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                 if (line.isEmpty()) { continue; }
 
                 // a column-one marker claims the whole raw line before it is trimmed
-                if (openBlock == null && opensInColumnOne(raw, markers)) {
+                if (openBlock == null && openQuote == null && opensInColumnOne(raw, markers)) {
                     commentLines++;
                     continue;
                 }
@@ -99,6 +104,20 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                         } else {
                             position = end + openBlock.end().length();
                             openBlock = null;
+                        }
+                        continue;
+                    }
+
+                    if (openQuote != null) {
+                        // a literal is code, however much its contents resemble a comment
+                        holdsCode = true;
+
+                        int end = closesAt(line, position, openQuote);
+                        if (end < 0) {
+                            position = line.length();
+                        } else {
+                            position = end + openQuote.close().length();
+                            openQuote = null;
                         }
                         continue;
                     }
@@ -122,6 +141,42 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                             opening = marker;
                             start = index;
                         }
+                    }
+
+                    Quote quoting = null;
+                    int quoted = -1;
+
+                    for (Quote quote : quotes) {
+                        int index = line.indexOf(quote.open(), position);
+                        if (index < 0) { continue; }
+
+                        boolean better = quoted < 0
+                                      || index < quoted
+                                      || (index == quoted && quote.open().length() > quoting.open().length());
+
+                        if (better) {
+                            quoting = quote;
+                            quoted = index;
+                        }
+                    }
+
+                    // whichever opens first decides: a marker inside a literal is not a
+                    // comment, and a quote inside a comment is not a literal
+                    if (quoting != null && (opening == null || quoted < start)) {
+                        holdsCode = true;
+
+                        int end = closesAt(line, quoted + quoting.open().length(), quoting);
+
+                        if (end >= 0) {
+                            position = end + quoting.close().length();
+                        } else if (quoting.spansLines()) {
+                            openQuote = quoting;
+                            position = line.length();
+                        } else {
+                            // an unterminated one-line literal: the rest of the line is code
+                            position = line.length();
+                        }
+                        continue;
                     }
 
                     if (opening == null) {
@@ -149,6 +204,28 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
         }
 
         return new Statistics(resource, sourceLines, commentLines, totalLines);
+    }
+
+    /**
+     * Where {@code quote} closes at or after {@code from}, or {@code -1} if it does not
+     * close on this line. An escapable literal skips the character after a backslash, so
+     * that the embedded quote of {@code "a\"b"} does not end it.
+     */
+    private static int closesAt(String line, int from, Quote quote) {
+        int index = from;
+
+        while (index < line.length()) {
+            if (quote.escapable() && line.charAt(index) == '\\') {
+                index += 2;
+                continue;
+            }
+
+            if (line.startsWith(quote.close(), index)) { return index; }
+
+            index++;
+        }
+
+        return -1;
     }
 
     /** Whether an untrimmed line opens with one of the column-one markers. */

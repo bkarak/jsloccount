@@ -29,7 +29,7 @@ Outputs are written to the **current working directory**, named `<dirname>-files
 
 Single pass, four stages, driven by `Main.main`:
 
-1. **`project/Resource`** (enum) — the single source of truth for every supported file type. Each constant carries comment markers, extensions/filenames, and a display name. The 3-arg constructor (`List<Marker>, List<String>, String`) declares a *text* resource that gets line-counted; the 2-arg one (`List<String>, String`) declares a *binary* resource that only gets file-counted. `Resource.detect()` matches by `String.endsWith` over the **filename**, **in declaration order** — so entries whose "extension" is really a full filename (`build.xml`, `Makefile`) must stay at the top of the enum, before the suffix-based ones, or they get shadowed. Adding a language = one enum constant; nothing else needs touching.
+1. **`project/Resource`** (enum) — the single source of truth for every supported file type. Each constant carries comment markers, optionally a `Quotes.*` string-literal family (shared presets rather than per-constant delimiters — a separate class, since an enum constant may not reference its own enum's static fields), extensions/filenames, and a display name. The 3-arg constructor (`List<Marker>, List<String>, String`) declares a *text* resource that gets line-counted; the 2-arg one (`List<String>, String`) declares a *binary* resource that only gets file-counted. `Resource.detect()` matches by `String.endsWith` over the **filename**, **in declaration order** — so entries whose "extension" is really a full filename (`build.xml`, `Makefile`) must stay at the top of the enum, before the suffix-based ones, or they get shadowed. Adding a language = one enum constant; nothing else needs touching.
 
 2. **`project/ProjectStatistics`** — walks the directory with `Files.walkFileTree` (following symlinks, skipping hidden files and dirs, logging and continuing past unreadable entries and symlink loops), calls `Resource.detect` per file, and accumulates a `LanguageStatistics` per `Resource` in an `EnumMap`. Binary and `OTHER` resources only bump the file count. The `EnumMap` is what makes report ordering deterministic — ties break by enum declaration order.
 
@@ -49,6 +49,7 @@ The scanner in `Statistics.count` walks each line segment by segment rather than
 - Where two markers start at the same index, the longer one wins, so Java's `/**` beats `/*` and Lua's `--[[` beats `--`.
 - Blank lines count toward `totalLines` only.
 - `Marker.inColumnOne(...)` markers match only at index 0 of the **untrimmed** line, which is what fixed-form Fortran needs: a column-one `C` opens a comment, but the `C` of an indented `CALL FOO` does not. Only Fortran uses this; everything else matches anywhere on the line.
+- **String literals are skipped, not searched.** Whichever opens first at the current position wins: a marker inside a literal opens no comment (`char *url = "http://example.com";` is code alone), and a quote inside a comment opens no literal. Escapable literals step over `\"`, and spanning ones (Java text blocks, Python docstrings, JS templates) carry across lines exactly as block comments do. Literal content always counts as code.
 
 There are no unit tests, so changes here are verified by counting a corpus with hand-computed expectations (see the "Build & Run" note above).
 
@@ -91,7 +92,6 @@ Deliberately **not** supported, and worth not "fixing" by accident:
 
 - `README.md`'s "Eat Your Own dogfood" section opens with a `Number of Files: … Number of Lines (comments): …` console block. The tool has no such console report — it only writes the two CSVs, which the rest of that section shows correctly. Either the feature was dropped or the docs were aspirational.
 - `Resource.detect` matches whole-filename entries by suffix, so `mybuild.xml` is detected as an ANT build file. Exact-filename matching for entries without a leading dot would tighten this.
-- **No string-literal awareness.** `char *url = "http://example.com";` counts as a comment line because the `//` inside the string opens one. This affects every C-family language and is the largest remaining source of miscounting; fixing it needs per-language string rules, not another marker.
 - **Nested block comments are not supported.** Rust, Scala, Kotlin, D and Haskell allow `/* /* */ */`; the scanner closes at the first end marker, so the tail of a nested block is counted as code.
 - Vim Script uses `"` for comments *and* for string literals, so `.vim` counts are optimistic. It is listed anyway because `"` genuinely is the comment character.
 - No unit tests at all.

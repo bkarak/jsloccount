@@ -27,6 +27,8 @@ package org.jsloc.project;
 import java.util.List;
 
 import org.jsloc.resources.statistics.Marker;
+import org.jsloc.resources.statistics.Quote;
+import org.jsloc.resources.statistics.Quotes;
 
 import static java.util.stream.Collectors.joining;
 
@@ -48,98 +50,98 @@ import static java.util.stream.Collectors.joining;
 public enum Resource {
     // text
     // first of all, put the files with full filenames
-    ANT(List.of(new Marker("<!--", "-->")), List.of("build.xml"), "ANT Build File"),
-    MAKE(List.of(new Marker("#")), List.of("Makefile", "makefile", "GNUmakefile", ".inc", ".mk"), "make"),
+    ANT(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of("build.xml"), "ANT Build File"),
+    MAKE(List.of(new Marker("#")), Quotes.SHELL, List.of("Makefile", "makefile", "GNUmakefile", ".inc", ".mk"), "make"),
     // then the rest
-    HASKELL(List.of(new Marker("--"), new Marker("{-", "-}")), List.of(".hs"), "Haskell"),
-    JAVA(List.of(new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), List.of(".java"), "Java"),
-    C(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".c"), "C"),
-    CPLUSPLUS(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".C", ".cpp", ".cxx", ".cc"), "C++"),
-    HEADER(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".h", ".hxx", ".H", ".hpp", ".hh"), "C/C++/SWIFT/Objective-c Headers"),
-    PASCAL(List.of(new Marker("//"), new Marker("{", "}"), new Marker("(*", "*)")), List.of(".p", ".pas"), "Pascal"),
-    BOURNESHELL(List.of(new Marker("#")), List.of(".sh", ".bash", ".ksh"), "Bourne Shell"),
-    CSHARP(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".cs"), "C#"),
-    XML(List.of(new Marker("<!--", "-->")), List.of(".xml"), "XML"),
-    HTML(List.of(new Marker("<!--", "-->")), List.of(".htm", ".html"), "HTML"),
+    HASKELL(List.of(new Marker("--"), new Marker("{-", "-}")), Quotes.DOUBLE_ESCAPED, List.of(".hs"), "Haskell"),
+    JAVA(List.of(new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), Quotes.JAVA, List.of(".java"), "Java"),
+    C(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".c"), "C"),
+    CPLUSPLUS(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".C", ".cpp", ".cxx", ".cc"), "C++"),
+    HEADER(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".h", ".hxx", ".H", ".hpp", ".hh"), "C/C++/SWIFT/Objective-c Headers"),
+    PASCAL(List.of(new Marker("//"), new Marker("{", "}"), new Marker("(*", "*)")), Quotes.SINGLE_RAW, List.of(".p", ".pas"), "Pascal"),
+    BOURNESHELL(List.of(new Marker("#")), Quotes.SHELL, List.of(".sh", ".bash", ".ksh"), "Bourne Shell"),
+    CSHARP(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".cs"), "C#"),
+    XML(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".xml"), "XML"),
+    HTML(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".htm", ".html"), "HTML"),
     BIBTEX(List.of(new Marker("%")), List.of(".bib"), "BiBTeX"),
     TEX(List.of(new Marker("%")), List.of(".tex", ".cls"), "TeX/LaTeX"),
-    PERL(List.of(new Marker("#")), List.of(".pl", ".pm"), "Perl"),
-    AWK(List.of(new Marker("#")), List.of(".awk"), "awk"),
-    OBJECTIVEC(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".m"), "Objective-C"),
-    PHP(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("#"), new Marker("/*", "*/")), List.of(".php", ".php3", ".php4"), "PHP"),
-    XSL(List.of(new Marker("<!--", "-->")), List.of(".xsl", ".xslt"), "XSL/XSLT"),
-    BAT(List.of(new Marker("rem "), new Marker("REM "), new Marker("::")), List.of(".bat", ".cmd"), "MS-Dos/Windows Batch Files"),
-    XSD(List.of(new Marker("<!--", "-->")), List.of(".xsd", ".xs"), "X-Schema Files"),
-    DTD(List.of(new Marker("<!--", "-->")), List.of(".dtd", ".mod"), "Document Type Definition Files"),
-    SQL(List.of(new Marker("--"), new Marker("/*", "*/")), List.of(".sql"), "SQL"),
-    GNUPLOT(List.of(new Marker("#")), List.of(".plot", ".gnuplot"), "Gnuplot"),
+    PERL(List.of(new Marker("#")), Quotes.SHELL, List.of(".pl", ".pm"), "Perl"),
+    AWK(List.of(new Marker("#")), Quotes.DOUBLE_ESCAPED, List.of(".awk"), "awk"),
+    OBJECTIVEC(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".m"), "Objective-C"),
+    PHP(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("#"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".php", ".php3", ".php4"), "PHP"),
+    XSL(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".xsl", ".xslt"), "XSL/XSLT"),
+    BAT(List.of(new Marker("rem "), new Marker("REM "), new Marker("::")), Quotes.DOUBLE_RAW, List.of(".bat", ".cmd"), "MS-Dos/Windows Batch Files"),
+    XSD(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".xsd", ".xs"), "X-Schema Files"),
+    DTD(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".dtd", ".mod"), "Document Type Definition Files"),
+    SQL(List.of(new Marker("--"), new Marker("/*", "*/")), Quotes.MARKUP, List.of(".sql"), "SQL"),
+    GNUPLOT(List.of(new Marker("#")), Quotes.SHELL, List.of(".plot", ".gnuplot"), "Gnuplot"),
     SED(List.of(new Marker("#")), List.of(".sed"), "SED"),
     TEXT(List.of(), List.of(".txt", ".text"), "ASCII Text Files"),
-    VISUALSTUDIOPROJECT(List.of(new Marker("<!--", "-->")), List.of(".vcproj"), "Visual Studio Project File"),
-    CSHARPPROJECT(List.of(new Marker("<!--", "-->")), List.of(".csproj"), "Visual Studio C# Project File"),
-    RDF(List.of(new Marker("<!--", "-->")), List.of(".rdf"), "RDF"),
-    WSDL(List.of(new Marker("<!--", "-->")), List.of(".wsdl"), "WSDL"),
-    POM(List.of(new Marker("<!--", "-->")), List.of(".pom"), "Maven POM File"),
-    JSP(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), List.of(".jsp"), "JSP"),
-    JAVASCRIPT(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".js", ".mjs", ".cjs", ".jsx"), "Javascript"),
-    CSHELL(List.of(new Marker("#")), List.of(".csh"), "C-Shell"),
+    VISUALSTUDIOPROJECT(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".vcproj"), "Visual Studio Project File"),
+    CSHARPPROJECT(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".csproj"), "Visual Studio C# Project File"),
+    RDF(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".rdf"), "RDF"),
+    WSDL(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".wsdl"), "WSDL"),
+    POM(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".pom"), "Maven POM File"),
+    JSP(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), Quotes.C_FAMILY, List.of(".jsp"), "JSP"),
+    JAVASCRIPT(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.JAVASCRIPT, List.of(".js", ".mjs", ".cjs", ".jsx"), "Javascript"),
+    CSHELL(List.of(new Marker("#")), Quotes.SHELL, List.of(".csh"), "C-Shell"),
     RTF(List.of(), List.of(".rtf"), "RTF"),
-    PYTHON(List.of(new Marker("#")), List.of(".py"), "Python"),
-    JAVACC(List.of(new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), List.of(".jj"), "JavaCC Grammar Files"),
-    RUBY(List.of(new Marker("#"), new Marker("=begin", "=end")), List.of(".rb"), "Ruby"),
-    TCL(List.of(new Marker("#")), List.of(".tcl"), "TCL"),
-    TCLTK(List.of(new Marker("#")), List.of(".tk"), "TCL/Tk"),
-    D(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".d"), "D"),
-    CMAKE(List.of(new Marker("#"), new Marker("//")), List.of(".cmake", "CMakeLists.txt"), "CMake"),
-    SCALA(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".scala"), "Scala"),
-    FORTRAN(List.of(Marker.inColumnOne("C"), Marker.inColumnOne("c"), Marker.inColumnOne("*"), new Marker("!")), List.of(".f", ".for", ".f77"), "Fortran (fixed-form)"),
+    PYTHON(List.of(new Marker("#")), Quotes.PYTHON, List.of(".py"), "Python"),
+    JAVACC(List.of(new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), Quotes.C_FAMILY, List.of(".jj"), "JavaCC Grammar Files"),
+    RUBY(List.of(new Marker("#"), new Marker("=begin", "=end")), Quotes.SHELL, List.of(".rb"), "Ruby"),
+    TCL(List.of(new Marker("#")), Quotes.DOUBLE_ESCAPED, List.of(".tcl"), "TCL"),
+    TCLTK(List.of(new Marker("#")), Quotes.DOUBLE_ESCAPED, List.of(".tk"), "TCL/Tk"),
+    D(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".d"), "D"),
+    CMAKE(List.of(new Marker("#"), new Marker("//")), Quotes.SHELL, List.of(".cmake", "CMakeLists.txt"), "CMake"),
+    SCALA(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".scala"), "Scala"),
+    FORTRAN(List.of(Marker.inColumnOne("C"), Marker.inColumnOne("c"), Marker.inColumnOne("*"), new Marker("!")), Quotes.MARKUP, List.of(".f", ".for", ".f77"), "Fortran (fixed-form)"),
     // 2017 additions
-    GO(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".go"), "Go"),
-    SWIFT(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".swift"), "Swift"),
+    GO(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".go"), "Go"),
+    SWIFT(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".swift"), "Swift"),
     // 2026 additions: languages
-    TYPESCRIPT(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".ts", ".tsx", ".mts", ".cts"), "TypeScript"),
-    RUST(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".rs"), "Rust"),
-    KOTLIN(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".kt", ".kts"), "Kotlin"),
-    LUA(List.of(new Marker("--"), new Marker("--[[", "]]")), List.of(".lua"), "Lua"),
-    DART(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".dart"), "Dart"),
-    ELIXIR(List.of(new Marker("#")), List.of(".ex", ".exs"), "Elixir"),
-    CLOJURE(List.of(new Marker(";")), List.of(".clj", ".cljs", ".cljc", ".edn"), "Clojure"),
-    SCHEME(List.of(new Marker(";")), List.of(".scm"), "Scheme"),
-    R(List.of(new Marker("#")), List.of(".r", ".R"), "R"),
-    POWERSHELL(List.of(new Marker("#"), new Marker("<#", "#>")), List.of(".ps1", ".psm1", ".psd1"), "PowerShell"),
-    ZSH(List.of(new Marker("#")), List.of(".zsh"), "Z Shell"),
-    FISH(List.of(new Marker("#")), List.of(".fish"), "Fish Shell"),
-    PROTOBUF(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".proto"), "Protocol Buffers"),
-    GROOVY(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".groovy", ".gradle"), "Groovy"),
-    JULIA(List.of(new Marker("#"), new Marker("#=", "=#")), List.of(".jl"), "Julia"),
-    ZIG(List.of(new Marker("//")), List.of(".zig"), "Zig"),
-    VUE(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/")), List.of(".vue"), "Vue Single-File Component"),
-    SVELTE(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/")), List.of(".svelte"), "Svelte Component"),
-    ERLANG(List.of(new Marker("%")), List.of(".erl", ".hrl"), "Erlang"),
-    OCAML(List.of(new Marker("(*", "*)")), List.of(".ml", ".mli"), "OCaml"),
-    FSHARP(List.of(new Marker("//"), new Marker("(*", "*)")), List.of(".fs", ".fsx", ".fsi"), "F#"),
-    VISUALBASIC(List.of(new Marker("'")), List.of(".vb", ".bas"), "Visual Basic"),
-    GRAPHQL(List.of(new Marker("#")), List.of(".graphql", ".gql"), "GraphQL"),
-    FORTRANFREE(List.of(new Marker("!")), List.of(".f90", ".f95", ".f03", ".f08"), "Fortran (free-form)"),
+    TYPESCRIPT(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.JAVASCRIPT, List.of(".ts", ".tsx", ".mts", ".cts"), "TypeScript"),
+    RUST(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.DOUBLE_ESCAPED, List.of(".rs"), "Rust"),
+    KOTLIN(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".kt", ".kts"), "Kotlin"),
+    LUA(List.of(new Marker("--"), new Marker("--[[", "]]")), Quotes.C_FAMILY, List.of(".lua"), "Lua"),
+    DART(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".dart"), "Dart"),
+    ELIXIR(List.of(new Marker("#")), Quotes.DOUBLE_ESCAPED, List.of(".ex", ".exs"), "Elixir"),
+    CLOJURE(List.of(new Marker(";")), Quotes.DOUBLE_ESCAPED, List.of(".clj", ".cljs", ".cljc", ".edn"), "Clojure"),
+    SCHEME(List.of(new Marker(";")), Quotes.DOUBLE_ESCAPED, List.of(".scm"), "Scheme"),
+    R(List.of(new Marker("#")), Quotes.C_FAMILY, List.of(".r", ".R"), "R"),
+    POWERSHELL(List.of(new Marker("#"), new Marker("<#", "#>")), Quotes.SHELL, List.of(".ps1", ".psm1", ".psd1"), "PowerShell"),
+    ZSH(List.of(new Marker("#")), Quotes.SHELL, List.of(".zsh"), "Z Shell"),
+    FISH(List.of(new Marker("#")), Quotes.SHELL, List.of(".fish"), "Fish Shell"),
+    PROTOBUF(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".proto"), "Protocol Buffers"),
+    GROOVY(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".groovy", ".gradle"), "Groovy"),
+    JULIA(List.of(new Marker("#"), new Marker("#=", "=#")), Quotes.DOUBLE_ESCAPED, List.of(".jl"), "Julia"),
+    ZIG(List.of(new Marker("//")), Quotes.C_FAMILY, List.of(".zig"), "Zig"),
+    VUE(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/")), Quotes.JAVASCRIPT, List.of(".vue"), "Vue Single-File Component"),
+    SVELTE(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/")), Quotes.JAVASCRIPT, List.of(".svelte"), "Svelte Component"),
+    ERLANG(List.of(new Marker("%")), Quotes.DOUBLE_ESCAPED, List.of(".erl", ".hrl"), "Erlang"),
+    OCAML(List.of(new Marker("(*", "*)")), Quotes.DOUBLE_ESCAPED, List.of(".ml", ".mli"), "OCaml"),
+    FSHARP(List.of(new Marker("//"), new Marker("(*", "*)")), Quotes.DOUBLE_ESCAPED, List.of(".fs", ".fsx", ".fsi"), "F#"),
+    VISUALBASIC(List.of(new Marker("'")), Quotes.DOUBLE_RAW, List.of(".vb", ".bas"), "Visual Basic"),
+    GRAPHQL(List.of(new Marker("#")), Quotes.DOUBLE_ESCAPED, List.of(".graphql", ".gql"), "GraphQL"),
+    FORTRANFREE(List.of(new Marker("!")), Quotes.MARKUP, List.of(".f90", ".f95", ".f03", ".f08"), "Fortran (free-form)"),
     VIMSCRIPT(List.of(new Marker("\"")), List.of(".vim"), "Vim Script"),
     // 2026 additions: configuration and markup
-    YAML(List.of(new Marker("#")), List.of(".yml", ".yaml"), "YAML"),
-    TOML(List.of(new Marker("#")), List.of(".toml"), "TOML"),
-    JSON(List.of(), List.of(".json"), "JSON"),
-    JSONC(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".jsonc", ".json5"), "JSON with Comments"),
+    YAML(List.of(new Marker("#")), Quotes.SHELL, List.of(".yml", ".yaml"), "YAML"),
+    TOML(List.of(new Marker("#")), Quotes.SHELL, List.of(".toml"), "TOML"),
+    JSON(List.of(), Quotes.DOUBLE_ESCAPED, List.of(".json"), "JSON"),
+    JSONC(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".jsonc", ".json5"), "JSON with Comments"),
     MARKDOWN(List.of(new Marker("<!--", "-->")), List.of(".md", ".markdown"), "Markdown"),
-    CSS(List.of(new Marker("/*", "*/")), List.of(".css"), "CSS"),
-    SASS(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".scss", ".sass", ".less"), "Sass/SCSS/Less"),
-    DOCKERFILE(List.of(new Marker("#")), List.of("Dockerfile", ".dockerfile"), "Dockerfile"),
-    TERRAFORM(List.of(new Marker("#"), new Marker("//"), new Marker("/*", "*/")), List.of(".tf", ".tfvars", ".hcl"), "Terraform/HCL"),
-    NIX(List.of(new Marker("#"), new Marker("/*", "*/")), List.of(".nix"), "Nix"),
-    INI(List.of(new Marker("#"), new Marker(";")), List.of(".ini", ".cfg", ".conf", ".properties", ".desktop"), "INI/Config Files"),
-    SVG(List.of(new Marker("<!--", "-->")), List.of(".svg"), "SVG Images"),
+    CSS(List.of(new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".css"), "CSS"),
+    SASS(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".scss", ".sass", ".less"), "Sass/SCSS/Less"),
+    DOCKERFILE(List.of(new Marker("#")), Quotes.SHELL, List.of("Dockerfile", ".dockerfile"), "Dockerfile"),
+    TERRAFORM(List.of(new Marker("#"), new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".tf", ".tfvars", ".hcl"), "Terraform/HCL"),
+    NIX(List.of(new Marker("#"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".nix"), "Nix"),
+    INI(List.of(new Marker("#"), new Marker(";")), Quotes.SHELL, List.of(".ini", ".cfg", ".conf", ".properties", ".desktop"), "INI/Config Files"),
+    SVG(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".svg"), "SVG Images"),
     ASCIIDOC(List.of(new Marker("//")), List.of(".adoc", ".asciidoc"), "AsciiDoc"),
-    QML(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".qml"), "QML"),
+    QML(List.of(new Marker("//"), new Marker("/*", "*/")), Quotes.C_FAMILY, List.of(".qml"), "QML"),
     M4(List.of(new Marker("dnl"), new Marker("#")), List.of(".m4"), "M4 Macro Files"),
-    DOCBOOK(List.of(new Marker("<!--", "-->")), List.of(".docbook"), "DocBook Documents"),
-    MALLARD(List.of(new Marker("<!--", "-->")), List.of(".page"), "Mallard Help Pages"),
+    DOCBOOK(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".docbook"), "DocBook Documents"),
+    MALLARD(List.of(new Marker("<!--", "-->")), Quotes.MARKUP, List.of(".page"), "Mallard Help Pages"),
     POD(List.of(), List.of(".pod"), "Perl POD Documentation"),
     // binary
     WORD(List.of(".doc", ".docx"), "MS Word Documents"),
@@ -255,22 +257,29 @@ public enum Resource {
     OTHER(List.of(), "Other");
 
     private final List<Marker> markers;
+    private final List<Quote> quotes;
     private final List<String> extensions;
     private final String name;
     private final boolean text;
 
     /** Declares a binary resource: files are counted, lines are not. */
     Resource(List<String> extensions, String name) {
-        this(List.of(), extensions, name, false);
+        this(List.of(), Quotes.NONE, extensions, name, false);
     }
 
-    /** Declares a text resource, counted with the given comment markers. */
+    /** Declares a text resource with no string literals to step over. */
     Resource(List<Marker> markers, List<String> extensions, String name) {
-        this(markers, extensions, name, true);
+        this(markers, Quotes.NONE, extensions, name, true);
     }
 
-    Resource(List<Marker> markers, List<String> extensions, String name, boolean text) {
+    /** Declares a text resource whose literals may contain comment-like text. */
+    Resource(List<Marker> markers, List<Quote> quotes, List<String> extensions, String name) {
+        this(markers, quotes, extensions, name, true);
+    }
+
+    Resource(List<Marker> markers, List<Quote> quotes, List<String> extensions, String name, boolean text) {
         this.markers = List.copyOf(markers);
+        this.quotes = List.copyOf(quotes);
         this.extensions = List.copyOf(extensions);
         this.name = name;
         this.text = text;
@@ -278,6 +287,11 @@ public enum Resource {
 
     public List<Marker> commentMarkers() {
         return markers;
+    }
+
+    /** The string literal styles whose contents must not be searched for comment markers. */
+    public List<Quote> stringQuotes() {
+        return quotes;
     }
 
     public List<String> extensions() {
