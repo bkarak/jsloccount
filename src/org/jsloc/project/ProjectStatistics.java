@@ -33,6 +33,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.ToLongFunction;
@@ -49,6 +50,7 @@ import static org.jsloc.Configuration.logWarn;
  */
 public class ProjectStatistics {
     private final Map<Resource, LanguageStatistics> stats = new EnumMap<>(Resource.class);
+    private final Map<String, Long> unknown = new HashMap<>();
     private final String projectName;
 
     public ProjectStatistics(Path directory) {
@@ -90,14 +92,28 @@ public class ProjectStatistics {
     }
 
     private void count(Path file) {
-        Resource resource = Resource.detect(file.getFileName().toString());
+        String fileName = file.getFileName().toString();
+        Resource resource = Resource.detect(fileName);
         LanguageStatistics languageStatistics = stats.computeIfAbsent(resource, key -> new LanguageStatistics());
 
         languageStatistics.addFile();
 
-        if (resource == Resource.OTHER || resource.isBinary()) { return; }
+        if (resource == Resource.OTHER) {
+            unknown.merge(suffixOf(fileName), 1L, Long::sum);
+            return;
+        }
+
+        if (resource.isBinary()) { return; }
 
         languageStatistics.add(Statistics.count(file, resource));
+    }
+
+    /** The suffix a report should blame for an unrecognized file. */
+    private static String suffixOf(String fileName) {
+        int dot = fileName.lastIndexOf('.');
+
+        // a leading dot is a hidden file, not an extension, and those never reach here
+        return dot <= 0 ? "(no extension)" : fileName.substring(dot);
     }
 
     public String projectName() {
@@ -127,6 +143,18 @@ public class ProjectStatistics {
     /** The resources actually present in the project, in {@link Resource} declaration order. */
     public List<Resource> resources() {
         return List.copyOf(stats.keySet());
+    }
+
+    /**
+     * How many files of each unrecognized suffix landed in {@link Resource#OTHER},
+     * most frequent first. This is the evidence for which file type to teach the
+     * tool next, so it is worth looking at after a scan of an unfamiliar project.
+     */
+    public List<Map.Entry<String, Long>> unknownSuffixes() {
+        return unknown.entrySet().stream()
+                      .sorted(Map.Entry.<String, Long>comparingByValue().reversed()
+                                       .thenComparing(Map.Entry.comparingByKey()))
+                      .toList();
     }
 
     private long get(Resource resource, ToLongFunction<LanguageStatistics> field) {

@@ -46,13 +46,52 @@ The scanner in `Statistics.count` walks each line segment by segment rather than
 - A line is counted **at most once** per bucket, but can land in both: `int c; /* inline */ int d;` is one source line and one comment line.
 - A block comment stays open across lines until its closing marker, including across blank lines. Interior lines are comments, not code.
 - Code after a block closes on the same line counts as source: `still open */ int e;` is both.
-- Where two markers start at the same index, the longer one wins, so Java's `/**` beats `/*`.
+- Where two markers start at the same index, the longer one wins, so Java's `/**` beats `/*` and Lua's `--[[` beats `--`.
 - Blank lines count toward `totalLines` only.
+- `Marker.inColumnOne(...)` markers match only at index 0 of the **untrimmed** line, which is what fixed-form Fortran needs: a column-one `C` opens a comment, but the `C` of an indented `CALL FOO` does not. Only Fortran uses this; everything else matches anywhere on the line.
 
 There are no unit tests, so changes here are verified by counting a corpus with hand-computed expectations (see the "Build & Run" note above).
+
+### Deciding what to support next
+
+There is a check worth re-running after any batch of additions — it walks every
+declared extension and asserts `Resource.detect` returns the declaring constant,
+which catches one type shadowing another:
+
+```java
+for (Resource r : Resource.values())
+    for (String ext : r.extensions())
+        assert Resource.detect(ext.startsWith(".") ? "sample" + ext : ext) == r;
+```
+
+`Main` prints a line naming the most common suffixes that fell into `OTHER`
+(`ProjectStatistics.unknownSuffixes()`), so the enum grows from evidence rather than
+guesswork — run the tool over a real project and read what it reports. Adding a type
+is one enum constant; longest-suffix matching means placement cannot shadow an
+existing entry. What needs deliberate thought is a **collision** (`.ts` TypeScript vs
+MPEG transport stream, `.m` Objective-C vs MATLAB, `.d` D vs make-deps, `.pl` Perl vs
+Prolog): equal-length matches fall to declaration order, so pick a winner on purpose.
+
+**Binary types matter as much as text ones.** They carry the `-filestats.csv` report,
+which is half of what the tool exists to produce — "Compiled Gettext Catalogs, 9214"
+is a project statistic, while the same files sitting in `OTHER` are noise. Adding a
+binary type is the same one-line change; it just uses the 2-argument constructor.
+
+Deliberately **not** supported, and worth not "fixing" by accident:
+
+- **Assembly (`.s`/`.asm`).** The comment character is per-architecture (`;`, `#`, `@`,
+  `//`), and `.S` files are preprocessed, so a `#` marker would count every `#include`
+  as a comment. Better absent than wrong.
+- **reStructuredText.** Its `..` comment prefix is indistinguishable from ordinary
+  directive and link syntax without a real parser.
+- **Numeric man-page sections (`.1` … `.9`).** `.3` would also swallow versioned shared
+  objects such as `libfoo.so.3`, which are far more common in a scanned tree.
 
 ### Remaining known issues
 
 - `README.md`'s "Eat Your Own dogfood" section opens with a `Number of Files: … Number of Lines (comments): …` console block. The tool has no such console report — it only writes the two CSVs, which the rest of that section shows correctly. Either the feature was dropped or the docs were aspirational.
 - `Resource.detect` matches whole-filename entries by suffix, so `mybuild.xml` is detected as an ANT build file. Exact-filename matching for entries without a leading dot would tighten this.
+- **No string-literal awareness.** `char *url = "http://example.com";` counts as a comment line because the `//` inside the string opens one. This affects every C-family language and is the largest remaining source of miscounting; fixing it needs per-language string rules, not another marker.
+- **Nested block comments are not supported.** Rust, Scala, Kotlin, D and Haskell allow `/* /* */ */`; the scanner closes at the first end marker, so the tail of a nested block is counted as code.
+- Vim Script uses `"` for comments *and* for string literals, so `.vim` counts are optimistic. It is listed anyway because `"` genuinely is the comment character.
 - No unit tests at all.

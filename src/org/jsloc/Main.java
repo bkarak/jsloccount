@@ -27,17 +27,23 @@ package org.jsloc;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 import org.jsloc.output.OutputFactory;
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.project.Resource;
 
+import static java.util.stream.Collectors.joining;
 import static org.jsloc.Configuration.logInfo;
 
 /**
  * @author Vassilios Karakoidas (bkarak@aueb.gr)
  */
 public class Main {
+
+    /** How many unrecognized suffixes to name before trailing off. */
+    private static final int UNKNOWN_REPORTED = 10;
 
     private static void help() {
         logInfo("JSLoCcount - Vassilios Karakoidas (bkarak@aueb.gr)\n");
@@ -70,6 +76,29 @@ public class Main {
             return;
         }
 
-        OutputFactory.getFileOutput(new ProjectStatistics(directory)).produce();
+        ProjectStatistics statistics = new ProjectStatistics(directory);
+
+        OutputFactory.getFileOutput(statistics).produce();
+        reportUnknown(statistics);
+    }
+
+    /**
+     * Names the most common file types the tool did not recognize, so that the gap
+     * in {@link Resource} is visible rather than buried in the "Other" bucket.
+     */
+    private static void reportUnknown(ProjectStatistics statistics) {
+        List<Map.Entry<String, Long>> unknown = statistics.unknownSuffixes();
+
+        if (unknown.isEmpty()) { return; }
+
+        long files = unknown.stream().mapToLong(Map.Entry::getValue).sum();
+        String top = unknown.stream()
+                            .limit(UNKNOWN_REPORTED)
+                            .map(entry -> entry.getKey() + " (" + entry.getValue() + ")")
+                            .collect(joining(", "));
+
+        logInfo(unknown.size() + " unrecognized file " + (unknown.size() == 1 ? "type" : "types")
+                + " covering " + files + " " + (files == 1 ? "file" : "files") + ": " + top
+                + (unknown.size() > UNKNOWN_REPORTED ? ", ..." : ""));
     }
 }

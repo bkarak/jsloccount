@@ -30,17 +30,34 @@ import java.util.Objects;
  * A comment delimiter pair. A marker whose start and end are identical (for
  * example {@code //} or {@code #}) comments out the rest of the line.
  *
+ * @param start       the text opening the comment
+ * @param end         the text closing it, equal to {@code start} for a line comment
+ * @param atLineStart whether the marker only opens a comment in column one
+ *
  * @author Vassilios Karakoidas (vassilios.karakoidas@gmail.com)
  */
-public record Marker(String start, String end) {
+public record Marker(String start, String end, boolean atLineStart) {
 
     public Marker {
         Objects.requireNonNull(start, "start");
         Objects.requireNonNull(end, "end");
     }
 
+    public Marker(String start, String end) {
+        this(start, end, false);
+    }
+
     public Marker(String marker) {
-        this(marker, marker);
+        this(marker, marker, false);
+    }
+
+    /**
+     * A line comment that only counts in column one of the untrimmed line, as
+     * fixed-form Fortran requires of its {@code C} and {@code *} markers. Anywhere
+     * else those characters are ordinary code.
+     */
+    public static Marker inColumnOne(String marker) {
+        return new Marker(marker, marker, true);
     }
 
     public boolean isSingleLine() {

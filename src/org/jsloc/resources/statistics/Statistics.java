@@ -79,6 +79,12 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                 // line inside a block comment leaves the block open
                 if (line.isEmpty()) { continue; }
 
+                // a column-one marker claims the whole raw line before it is trimmed
+                if (openBlock == null && opensInColumnOne(raw, markers)) {
+                    commentLines++;
+                    continue;
+                }
+
                 boolean holdsCode = false;
                 boolean holdsComment = false;
                 int position = 0;
@@ -101,6 +107,8 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                     int start = -1;
 
                     for (Marker marker : markers) {
+                        if (marker.atLineStart()) { continue; }
+
                         int index = line.indexOf(marker.start(), position);
                         if (index < 0) { continue; }
 
@@ -141,6 +149,15 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
         }
 
         return new Statistics(resource, sourceLines, commentLines, totalLines);
+    }
+
+    /** Whether an untrimmed line opens with one of the column-one markers. */
+    private static boolean opensInColumnOne(String raw, List<Marker> markers) {
+        for (Marker marker : markers) {
+            if (marker.atLineStart() && raw.startsWith(marker.start())) { return true; }
+        }
+
+        return false;
     }
 
     /** Whether {@code line} carries anything but whitespace in {@code [from, to)}. */
