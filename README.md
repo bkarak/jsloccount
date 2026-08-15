@@ -15,9 +15,33 @@ ant release
 Usage
 =====
 
-Typical usage involves the execution of the following command:
+<pre>
+java -jar jsloccount.jar [options] &lt;directory&gt;
+</pre>
 
-java -jar jsloccount.jar <directory>
+Options:
+
+<pre>
+  -o, --output &lt;dir&gt;    write the reports into &lt;dir&gt; (default: the working directory)
+  -n, --name &lt;name&gt;     base name for the report files (default: the scanned directory)
+      --stdout          write one combined report to standard output instead of files
+  -x, --exclude &lt;name&gt;  skip files and directories called &lt;name&gt;; repeatable
+      --include-hidden  scan hidden files and directories too
+  -q, --quiet           suppress progress messages
+      --list-languages  list every recognized file type and exit
+  -h, --help            show this help and exit
+  -V, --version         show the version and exit
+</pre>
+
+Two reports are written, <i>&lt;name&gt;-filestats.csv</i> and <i>&lt;name&gt;-sizestats.csv</i>, both
+RFC 4180 CSV. Progress messages go to standard error, so <i>--stdout</i> can be piped:
+
+<pre>
+java -jar jsloccount.jar --stdout --exclude node_modules ~/src/project | column -s, -t
+</pre>
+
+The exit status is 0 on success, 1 when the directory cannot be scanned, and 2 for a
+usage error.
 
 Eat Your Own dogfood
 ====================

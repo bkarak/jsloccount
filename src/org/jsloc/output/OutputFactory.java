@@ -26,11 +26,20 @@ package org.jsloc.output;
 
 import org.jsloc.project.ProjectStatistics;
 
+import java.io.PrintStream;
+import java.nio.file.Path;
+
 public final class OutputFactory {
 
     private OutputFactory() {}
 
-    public static AbstractOutput getFileOutput(ProjectStatistics ps) {
-        return new FileOutput(ps);
+    /** Reports written as a pair of CSV files named after the project. */
+    public static AbstractOutput getFileOutput(ProjectStatistics ps, Path directory, String name) {
+        return new FileOutput(ps, directory, name);
+    }
+
+    /** Both reports written to one stream, for piping. */
+    public static AbstractOutput getStreamOutput(ProjectStatistics ps, PrintStream stream) {
+        return new StreamOutput(ps, stream);
     }
 }

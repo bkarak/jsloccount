@@ -9,8 +9,20 @@ Plain Java + Ant, no dependencies, no test suite, no lint config. Targets **Java
 ```bash
 ant release          # javac --release 21 src/ -> build/, then jar -> jsloccount.jar (manifest: src/Manifest)
 ant clean            # remove jsloccount.jar and build/
-java -jar jsloccount.jar <directory>
+java -jar jsloccount.jar [options] <directory>
+java -jar jsloccount.jar --stdout -x node_modules <dir>   # one combined CSV table, pipeable
 ```
+
+`Options.parse` is a hand-rolled parser (no dependencies): `-o/--output`, `-n/--name`,
+`--stdout`, `-x/--exclude` (repeatable), `--include-hidden`, `-q/--quiet`,
+`--list-languages`, `-h/--help`, `-V/--version`. It accepts `--opt value` and
+`--opt=value`, and `--` ends option processing. Exit codes are **0** success,
+**1** unscannable directory, **2** usage error — bare invocation is a usage error, not
+a silent success, so an empty `$DIR` in a script cannot look like a clean run.
+
+All logging goes to **stderr** so that `--stdout` yields clean data. `--version` reads
+`Implementation-Version` from the jar manifest and falls back to a development marker
+when run from loose classes.
 
 Ant is **not installed on this machine**. To compile and run without it:
 
@@ -31,11 +43,11 @@ Single pass, four stages, driven by `Main.main`:
 
 1. **`project/Resource`** (enum) — the single source of truth for every supported file type. Each constant carries comment markers, optionally a `Quotes.*` string-literal family (shared presets rather than per-constant delimiters — a separate class, since an enum constant may not reference its own enum's static fields), extensions/filenames, and a display name. The 3-arg constructor (`List<Marker>, List<String>, String`) declares a *text* resource that gets line-counted; the 2-arg one (`List<String>, String`) declares a *binary* resource that only gets file-counted. `Resource.detect()` matches by `String.endsWith` over the **filename**, **in declaration order** — so entries whose "extension" is really a full filename (`build.xml`, `Makefile`) must stay at the top of the enum, before the suffix-based ones, or they get shadowed. Adding a language = one enum constant; nothing else needs touching.
 
-2. **`project/ProjectStatistics`** — walks the directory with `Files.walkFileTree` (following symlinks, skipping hidden files and dirs, logging and continuing past unreadable entries and symlink loops), calls `Resource.detect` per file, and accumulates a `LanguageStatistics` per `Resource` in an `EnumMap`. Binary and `OTHER` resources only bump the file count. The `EnumMap` is what makes report ordering deterministic — ties break by enum declaration order.
+2. **`project/ProjectStatistics`** — walks the directory with `Files.walkFileTree` (following symlinks, skipping hidden files and dirs unless `--include-hidden`, skipping any name given to `--exclude`, logging and continuing past unreadable entries and symlink loops), calls `Resource.detect` per file, and accumulates a `LanguageStatistics` per `Resource` in an `EnumMap`. Binary and `OTHER` resources only bump the file count. The `EnumMap` is what makes report ordering deterministic — ties break by enum declaration order.
 
 3. **`resources/statistics/Statistics`** — the counter, a record produced by the static factory `Statistics.count(Path, Resource)`. It scans each trimmed line segment by segment, carrying an `openBlock` marker across lines, and decides at the end of the line whether it held code, a comment, or both. Single-line markers are those where start equals end (`Marker.isSingleLine()`). Files are read as UTF-8 with malformed bytes replaced, so an oddly-encoded file cannot abort a scan. See "Counting rules" below.
 
-4. **`output/`** — `OutputFactory.getFileOutput()` is the only entry point (`AbstractOutput` exists for alternative outputs that don't exist yet). `AbstractOutput` builds the two descending-sorted lists of `ResourceValue` (a record; sort with `ResourceValue.BY_VALUE_DESCENDING`): `byFiles` covers every resource and feeds `-filestats.csv`, `byLines` is text-only and feeds `-sizestats.csv`. `FileOutput.produce()` renders them, skipping `OTHER` in the file report.
+4. **`output/`** — `AbstractOutput` builds the two descending-sorted lists of `ResourceValue` (a record; sort with `ResourceValue.BY_VALUE_DESCENDING`): `byFiles` covers every resource and feeds `-filestats.csv`, `byLines` is text-only and feeds `-sizestats.csv`. It also renders all three report bodies, so the subclasses only choose a destination: `FileOutput` writes the two files, `StreamOutput` writes `combinedStatistics()` — one row per resource, line counts blank for binaries — to a stream for `--stdout`. `OTHER` is skipped in the file and combined reports. Every field goes through `Csv`, which quotes per RFC 4180; note `Csv.row(String...)` versus `Csv.counts(String, long...)`, split because overloaded varargs are ambiguous for a lone string.
 
 `Configuration` is a static logger (`[INFO]`/`[WARN]`/`[ERRO]` to stdout) and nothing else.
 

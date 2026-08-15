@@ -24,9 +24,8 @@
 */
 package org.jsloc;
 
+import java.io.PrintStream;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +34,7 @@ import org.jsloc.project.ProjectStatistics;
 import org.jsloc.project.Resource;
 
 import static java.util.stream.Collectors.joining;
+import static org.jsloc.Configuration.logError;
 import static org.jsloc.Configuration.logInfo;
 
 /**
@@ -45,41 +45,84 @@ public class Main {
     /** How many unrecognized suffixes to name before trailing off. */
     private static final int UNKNOWN_REPORTED = 10;
 
-    private static void help() {
-        logInfo("JSLoCcount - Vassilios Karakoidas (bkarak@aueb.gr)\n");
-        logInfo("usage:\n");
-        logInfo("java -jar jsloccount.jar <directory>\n");
+    private static final int OK = 0;
+    private static final int FAILED = 1;
+    private static final int MISUSED = 2;
 
-        logInfo("Supported Languages:\n");
+    public static void main(String[] args) {
+        System.exit(run(args));
+    }
+
+    static int run(String[] args) {
+        Options options;
+
+        try {
+            options = Options.parse(args);
+        } catch (Options.UsageException ue) {
+            logError(ue.getMessage());
+            help(System.err);
+            return MISUSED;
+        }
+
+        Configuration.setQuiet(options.quiet());
+
+        switch (options.action()) {
+            case HELP -> { help(System.out); return OK; }
+            case VERSION -> { System.out.println("jsloccount " + version()); return OK; }
+            case LIST_LANGUAGES -> { listLanguages(); return OK; }
+            case SCAN -> { /* below */ }
+        }
+
+        if (!Files.isDirectory(options.directory())) {
+            logError(options.directory().toAbsolutePath() + " is not a directory");
+            return FAILED;
+        }
+
+        ProjectStatistics statistics =
+                new ProjectStatistics(options.directory(), options.excluded(), options.hidden());
+
+        String name = options.name() == null ? statistics.projectName() : options.name();
+
+        if (options.toStdout()) {
+            OutputFactory.getStreamOutput(statistics, System.out).produce();
+        } else {
+            OutputFactory.getFileOutput(statistics, options.output(), name).produce();
+        }
+
+        reportUnknown(statistics);
+        return OK;
+    }
+
+    private static void help(PrintStream out) {
+        out.println("""
+            jsloccount - calculate size metrics for the source in a directory tree
+
+            usage: java -jar jsloccount.jar [options] <directory>
+
+            options:
+              -o, --output <dir>    write the reports into <dir> (default: the working directory)
+              -n, --name <name>     base name for the report files (default: the scanned directory)
+                  --stdout          write one combined report to standard output instead of files
+              -x, --exclude <name>  skip files and directories called <name>; repeatable
+                  --include-hidden  scan hidden files and directories too
+              -q, --quiet           suppress progress messages
+                  --list-languages  list every recognized file type and exit
+              -h, --help            show this help and exit
+              -V, --version         show the version and exit
+
+            Reports are written as <name>-filestats.csv and <name>-sizestats.csv.
+            Progress messages go to standard error, so --stdout can be piped.""");
+    }
+
+    private static void listLanguages() {
         for (Resource resource : Resource.values()) {
-            logInfo("* " + resource);
+            System.out.println(resource);
         }
     }
 
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            help();
-            return;
-        }
-
-        Path directory;
-
-        try {
-            directory = Path.of(args[0]);
-        } catch (InvalidPathException ipe) {
-            logInfo("ERROR: " + args[0] + " is not a valid path");
-            return;
-        }
-
-        if (!Files.isDirectory(directory)) {
-            logInfo("ERROR: " + directory.toAbsolutePath() + " is not a directory");
-            return;
-        }
-
-        ProjectStatistics statistics = new ProjectStatistics(directory);
-
-        OutputFactory.getFileOutput(statistics).produce();
-        reportUnknown(statistics);
+    private static String version() {
+        String declared = Main.class.getPackage().getImplementationVersion();
+        return declared == null ? "(development build)" : declared;
     }
 
     /**

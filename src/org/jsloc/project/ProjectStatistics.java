@@ -36,6 +36,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.ToLongFunction;
 
 import org.jsloc.resources.statistics.Statistics;
@@ -52,13 +53,25 @@ public class ProjectStatistics {
     private final Map<Resource, LanguageStatistics> stats = new EnumMap<>(Resource.class);
     private final Map<String, Long> unknown = new HashMap<>();
     private final String projectName;
+    private final Set<String> excluded;
+    private final boolean scanHidden;
 
     public ProjectStatistics(Path directory) {
+        this(directory, Set.of(), false);
+    }
+
+    /**
+     * @param excluded file and directory names to skip wherever they appear
+     * @param hidden   whether to scan hidden files and directories too
+     */
+    public ProjectStatistics(Path directory, Set<String> excluded, boolean hidden) {
         Path absolute = directory.toAbsolutePath().normalize();
         Path name = absolute.getFileName();
 
         // getFileName() is null for a filesystem root, e.g. "/"
         this.projectName = (name == null ? absolute.toString() : name.toString()).trim();
+        this.excluded = Set.copyOf(excluded);
+        this.scanHidden = hidden;
         walk(directory);
     }
 
@@ -67,13 +80,13 @@ public class ProjectStatistics {
             Files.walkFileTree(root, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes) throws IOException {
-                    boolean skip = !directory.equals(root) && Files.isHidden(directory);
+                    boolean skip = !directory.equals(root) && skipped(directory);
                     return skip ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
                 }
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                    if (!Files.isHidden(file)) {
+                    if (!skipped(file)) {
                         count(file);
                     }
                     return FileVisitResult.CONTINUE;
@@ -89,6 +102,15 @@ public class ProjectStatistics {
         } catch (IOException ioe) {
             logError("Cannot walk " + root + " (" + ioe.getMessage() + ")");
         }
+    }
+
+    /** Whether an entry is excluded by name, or hidden while hidden entries are being skipped. */
+    private boolean skipped(Path entry) throws IOException {
+        Path name = entry.getFileName();
+
+        if (name != null && excluded.contains(name.toString())) { return true; }
+
+        return !scanHidden && Files.isHidden(entry);
     }
 
     private void count(Path file) {

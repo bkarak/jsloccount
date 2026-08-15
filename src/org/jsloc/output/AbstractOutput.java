@@ -61,5 +61,56 @@ public abstract class AbstractOutput {
 
     public List<ResourceValue> getResourcesByFiles() { return byFiles; }
 
+    /** The file-count report, every resource but {@link Resource#OTHER}. */
+    protected String fileStatistics() {
+        StringBuilder report = new StringBuilder(Csv.row("Resource Type", "File Count", "Total File Count"));
+
+        for (ResourceValue value : getResourcesByFiles()) {
+            if (value.resource() == Resource.OTHER) { continue; }
+
+            report.append(Csv.counts(value.resource().displayName(),
+                                     value.value(),
+                                     projectStatistics.totalFileCount()));
+        }
+
+        return report.toString();
+    }
+
+    /** The size report, which covers text resources alone. */
+    protected String sizeStatistics() {
+        StringBuilder report = new StringBuilder(Csv.row("Resource Type", "Source Lines of Code", "Comments Lines of Code"));
+
+        for (ResourceValue value : getResourcesByLoc()) {
+            report.append(Csv.counts(value.resource().displayName(),
+                                     value.value(),
+                                     projectStatistics.commentLines(value.resource())));
+        }
+
+        return report.toString();
+    }
+
+    /**
+     * Both reports as one table, one row per resource, for a consumer that wants a
+     * single valid CSV document rather than two. Line counts are left empty for
+     * binary resources, where they do not apply, rather than reported as zero.
+     */
+    protected String combinedStatistics() {
+        StringBuilder report = new StringBuilder(Csv.row("Resource Type", "File Count", "Total File Count",
+                                                         "Source Lines of Code", "Comments Lines of Code"));
+
+        for (ResourceValue value : getResourcesByFiles()) {
+            Resource resource = value.resource();
+            if (resource == Resource.OTHER) { continue; }
+
+            report.append(Csv.row(resource.displayName(),
+                                  String.valueOf(value.value()),
+                                  String.valueOf(projectStatistics.totalFileCount()),
+                                  resource.isText() ? String.valueOf(projectStatistics.sourceLines(resource)) : "",
+                                  resource.isText() ? String.valueOf(projectStatistics.commentLines(resource)) : ""));
+        }
+
+        return report.toString();
+    }
+
     public abstract void produce();
 }

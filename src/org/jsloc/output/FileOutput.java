@@ -25,7 +25,6 @@
 package org.jsloc.output;
 
 import org.jsloc.project.ProjectStatistics;
-import org.jsloc.project.Resource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,53 +35,35 @@ import static org.jsloc.Configuration.logError;
 import static org.jsloc.Configuration.logInfo;
 
 /**
- * Writes the two CSV reports into the current working directory.
+ * Writes the two CSV reports as files in a chosen directory.
  *
  * @author Vassilios Karakoidas (bkarak@aueb.gr)
  */
 public class FileOutput extends AbstractOutput {
+    private final Path directory;
+    private final String name;
 
-    public FileOutput(ProjectStatistics ps) {
+    public FileOutput(ProjectStatistics ps, Path directory, String name) {
         super(ps);
+        this.directory = directory;
+        this.name = name;
     }
 
     @Override
     public void produce() {
-        StringBuilder fileStatistics = new StringBuilder("Resource Type,File Count,Total File Count\n");
-
-        for (ResourceValue value : getResourcesByFiles()) {
-            if (value.resource() == Resource.OTHER) { continue; }
-
-            fileStatistics.append(row(value.resource().displayName(),
-                                      value.value(),
-                                      projectStatistics.totalFileCount()));
-        }
-
-        // getResourcesByLoc() is text-only, so binaries stay out of the size report
-        StringBuilder sizeStatistics = new StringBuilder("Resource Type,Source Lines of Code,Comments Lines of Code\n");
-
-        for (ResourceValue value : getResourcesByLoc()) {
-            sizeStatistics.append(row(value.resource().displayName(),
-                                      value.value(),
-                                      projectStatistics.commentLines(value.resource())));
-        }
-
-        String projectName = projectStatistics.projectName();
-
-        saveToFile(fileStatistics, projectName + "-filestats.csv");
-        saveToFile(sizeStatistics, projectName + "-sizestats.csv");
+        saveToFile(fileStatistics(), name + "-filestats.csv");
+        saveToFile(sizeStatistics(), name + "-sizestats.csv");
     }
 
-    private static String row(String name, long first, long second) {
-        return String.join(",", name, String.valueOf(first), String.valueOf(second)) + "\n";
-    }
+    private void saveToFile(String contents, String filename) {
+        Path target = directory.resolve(filename);
 
-    private static void saveToFile(StringBuilder contents, String filename) {
         try {
-            Files.writeString(Path.of(filename), contents, StandardCharsets.UTF_8);
-            logInfo(filename + " created!");
+            Files.createDirectories(target.toAbsolutePath().getParent());
+            Files.writeString(target, contents, StandardCharsets.UTF_8);
+            logInfo(target + " created!");
         } catch (IOException ioe) {
-            logError("Failed to create ... " + filename + " (" + ioe.getMessage() + ")");
+            logError("Failed to create ... " + target + " (" + ioe.getMessage() + ")");
         }
     }
 }
