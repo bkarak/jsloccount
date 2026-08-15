@@ -1,27 +1,31 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="jsloccount" default="release">
 	<description>
 		JSLoCCount - Calculate size metrics for various languages
-        Vassilios Karakoidas (vassilios.karakoidas@gmail.com) - http://bkarak.wizhut.com/        
+        Vassilios Karakoidas (vassilios.karakoidas@gmail.com) - http://bkarak.wizhut.com/
 	</description>
-	
+
 	<!-- Property Declaration -->
 	<property name="build" location="${basedir}/build"/>
 	<property name="src" location="${basedir}/src"/>
-    
+	<property name="jar" location="${basedir}/jsloccount.jar"/>
+	<property name="java.release" value="21"/>
+
 	<!-- Compile and produce jar -->
 	<target name="release">
-		<echo>Compiling JSLoCCount ...</echo>
+		<echo>Compiling JSLoCCount for Java ${java.release} ...</echo>
 		<mkdir dir="${build}" />
-		<javac srcdir="${src}" destdir="${build}" debug="off" optimize="on" />
-		<jar basedir="${build}" destfile="${basedir}/jsloccount.jar" manifest="${src}/Manifest" />
+		<javac srcdir="${src}" destdir="${build}"
+		       release="${java.release}"
+		       encoding="UTF-8"
+		       includeantruntime="false"
+		       debug="on" />
+		<jar basedir="${build}" destfile="${jar}" manifest="${src}/Manifest" />
 	</target>
-	
+
 	<target name="clean">
 		<echo>Cleaning the mess ...</echo>
-		<delete file="${basedir}/jsloccount.jar" />
-		<delete>
-			<fileset dir="${build}" includes="**/*"/>
-		</delete>
+		<delete file="${jar}" quiet="true" />
+		<delete dir="${build}" quiet="true" />
 	</target>
 </project>

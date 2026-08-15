@@ -25,12 +25,13 @@
 package org.jsloc.resources.statistics;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import java.util.ArrayList;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.jsloc.project.Resource;
@@ -38,129 +39,124 @@ import org.jsloc.project.Resource;
 import static org.jsloc.Configuration.logError;
 
 /**
- * 
- * 
+ * Size metrics for a single text file.
+ *
+ * <p>A line is attributed to both counters when it carries code and a comment;
+ * a block comment keeps claiming lines until its closing marker is reached.
+ *
+ * @param resource     the detected type of the counted file
+ * @param sourceLines  lines holding code outside a comment
+ * @param commentLines lines holding any part of a comment
+ * @param totalLines   every line in the file, blank lines included
+ *
  * @author Vassilios Karakoidas (vassilios.karakoidas@gmail.com)
  */
-public class Statistics {
-    private final Resource resource;
+public record Statistics(Resource resource, long sourceLines, long commentLines, long totalLines) {
 
-    // statistics
-    private long linesOfCode;
-    private long totalLinesOfCode;
-    private long linesOfCommentCode;
+    /**
+     * Counts {@code file}, attributing lines according to the comment markers of
+     * {@code resource}. An unreadable file is reported and counted as empty.
+     */
+    public static Statistics count(Path file, Resource resource) {
+        List<Marker> markers = resource.commentMarkers();
 
-    // Private Enumeration, used to indicate the status of the parser
-    private enum Status { CODE, COMMENT, BOTH, SINGLE }
-    
-    public Statistics(File f, Resource resource) {
-        this.linesOfCode = 0;
-        this.linesOfCommentCode = 0;
-        this.totalLinesOfCode = 0;
-        this.resource = resource;
+        long sourceLines = 0;
+        long commentLines = 0;
+        long totalLines = 0;
 
-        // start the calculation
-        Marker[] markers = resource.getCommentMarkers();
-        
-        List<Marker> single = new ArrayList<>();
-        List<Marker> complex = new ArrayList<>();
-        
-        for ( Marker cm : markers ) {
-            if(cm.isSingleCommentMarker()) {
-                single.add(cm);
-            } else {
-                complex.add(cm);
-            }
-        }
+        try (BufferedReader reader = newReader(file)) {
+            // the block comment we are inside of, carried across lines; null when in code
+            Marker openBlock = null;
+            String raw;
 
-        try {
-            FileInputStream fis = new FileInputStream(f);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-            Status status = Status.CODE;
-            Marker cur = null;
+            while ((raw = reader.readLine()) != null) {
+                String line = raw.trim();
 
-            while (br.ready()) {
-                String line = br.readLine().trim();
-                int lineLen = line.length();
+                // count the total lines, this includes the empty ones
+                totalLines++;
 
-                // increase the total line, this includes the empty lines
-                totalLinesOfCode++;
-                
-                // if the line is empty, then continue to the next one
-                if (lineLen == 0) { continue; }
+                // if the line is empty, then continue to the next one; an empty
+                // line inside a block comment leaves the block open
+                if (line.isEmpty()) { continue; }
 
-                if(status == Status.CODE) {
-                    // Single line markers
-                    for ( Marker cm : single ) {
-                        int sIndex = line.indexOf(cm.getStartingMarker());
-                        if (sIndex < 0) { continue; }
-                        
-                        if (sIndex > 0) {
-                            status = Status.BOTH;
-                            break;
-                        } else if (sIndex == 0) {
-                            status = Status.SINGLE;
-                            break;
+                boolean holdsCode = false;
+                boolean holdsComment = false;
+                int position = 0;
+
+                while (position < line.length()) {
+                    if (openBlock != null) {
+                        holdsComment = true;
+
+                        int end = line.indexOf(openBlock.end(), position);
+                        if (end < 0) {
+                            position = line.length();
+                        } else {
+                            position = end + openBlock.end().length();
+                            openBlock = null;
                         }
-                    }
-                    
-                    if(status == Status.SINGLE || status == Status.BOTH) {
-                        linesOfCommentCode++;
-
-                        if(status == Status.BOTH) {
-                            linesOfCode++;
-                        }                        
-                        status = Status.CODE;
                         continue;
                     }
 
-                    // Complex line markers
-                    for ( Marker cm : complex ) {
-                        int sIndex = line.indexOf(cm.getStartingMarker());
-                        
-                        if (sIndex < 0) { continue; }
+                    Marker opening = null;
+                    int start = -1;
 
-                        if (sIndex > 0) {
-                            linesOfCode++;
+                    for (Marker marker : markers) {
+                        int index = line.indexOf(marker.start(), position);
+                        if (index < 0) { continue; }
+
+                        // earliest marker wins; on a tie the longer one is the more
+                        // specific of an overlapping pair, such as /** against /*
+                        boolean better = start < 0
+                                      || index < start
+                                      || (index == start && marker.start().length() > opening.start().length());
+
+                        if (better) {
+                            opening = marker;
+                            start = index;
                         }
+                    }
 
-                        status = Status.COMMENT;
-                        cur = cm;
-                        break;
+                    if (opening == null) {
+                        holdsCode |= holdsText(line, position, line.length());
+                        position = line.length();
+                        continue;
                     }
-                } 
-                if (status == Status.COMMENT) {
-                    linesOfCommentCode++;
-                    
-                    int sIndex = line.indexOf(cur.getEndingMarker());
-                    if(sIndex > 0) {
-                        linesOfCode++;
+
+                    holdsCode |= holdsText(line, position, start);
+                    holdsComment = true;
+
+                    if (opening.isSingleLine()) {
+                        position = line.length();
+                    } else {
+                        openBlock = opening;
+                        position = start + opening.start().length();
                     }
-                    status = Status.CODE;
-                    continue;
                 }
-                linesOfCode++;
-            }
 
-            br.close();
+                if (holdsCode) { sourceLines++; }
+                if (holdsComment) { commentLines++; }
+            }
         } catch (IOException ioe) {
             logError("Cannot read file " + ioe.getMessage());
         }
+
+        return new Statistics(resource, sourceLines, commentLines, totalLines);
     }
 
-    public long getLOC() {
-        return linesOfCode;
+    /** Whether {@code line} carries anything but whitespace in {@code [from, to)}. */
+    private static boolean holdsText(String line, int from, int to) {
+        return !line.substring(from, to).isBlank();
     }
 
-    public long getLOCOM() {
-        return linesOfCommentCode;
-    }
+    /**
+     * Reads as UTF-8, substituting undecodable bytes rather than failing, so that
+     * a stray latin-1 or binary-ish source file cannot abort the count.
+     */
+    private static BufferedReader newReader(Path file) throws IOException {
+        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
+                .onMalformedInput(CodingErrorAction.REPLACE)
+                .onUnmappableCharacter(CodingErrorAction.REPLACE);
 
-    public long getTotalLines() {
-        return totalLinesOfCode;
-    }
-
-    public Resource getLanguage() {
-        return resource;
+        return new BufferedReader(new InputStreamReader(Files.newInputStream(file), decoder));
     }
 }

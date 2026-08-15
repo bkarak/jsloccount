@@ -1,13 +1,39 @@
 package org.jsloc.project;
 
+import org.jsloc.resources.statistics.Statistics;
 
-public class LanguageStatistics {
-    long loc, noFiles, locom, totalLoc;
+/**
+ * Mutable running totals for one {@link Resource} across a whole project.
+ */
+final class LanguageStatistics {
+    private long sourceLines;
+    private long commentLines;
+    private long totalLines;
+    private long fileCount;
 
-    public LanguageStatistics() {
-        this.loc = 0;
-        this.noFiles = 0;
-        this.locom = 0;
-        this.totalLoc = 0;
+    void addFile() {
+        fileCount++;
+    }
+
+    void add(Statistics statistics) {
+        sourceLines += statistics.sourceLines();
+        commentLines += statistics.commentLines();
+        totalLines += statistics.totalLines();
+    }
+
+    long sourceLines() {
+        return sourceLines;
+    }
+
+    long commentLines() {
+        return commentLines;
+    }
+
+    long totalLines() {
+        return totalLines;
+    }
+
+    long fileCount() {
+        return fileCount;
     }
 }

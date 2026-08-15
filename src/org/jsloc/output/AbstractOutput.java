@@ -24,46 +24,42 @@
 */
 package org.jsloc.output;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.project.Resource;
 
 /**
+ * Turns a {@link ProjectStatistics} into the two ranked views every output format
+ * reports on, and leaves the rendering to its subclasses.
  *
- * 
  * @author Vassilios Karakoidas (bkarak@aueb.gr)
- *
  */
 public abstract class AbstractOutput {
-    protected ProjectStatistics projectStatistics;
-    private ArrayList<ResourceValue> sortedLoC;
-    private ArrayList<ResourceValue> sortedFiles;
-     
+    protected final ProjectStatistics projectStatistics;
+    private final List<ResourceValue> byLines;
+    private final List<ResourceValue> byFiles;
+
     protected AbstractOutput(ProjectStatistics ps) {
         this.projectStatistics = ps;
-        Resource[] resources = ps.getResources();
-        
-        // sort by loc 
-        sortedLoC = new ArrayList<>();
-        sortedFiles = new ArrayList<>();
 
-        for ( Resource r : resources ) {
-            if(r.isText()) {
-                sortedLoC.add(new ResourceValue(r, ps.getLOC(r)));
-            }
+        List<Resource> resources = ps.resources();
 
-            sortedFiles.add(new ResourceValue(r, ps.getFileCount(r)));
-        }
+        this.byLines = resources.stream()
+                                .filter(Resource::isText)
+                                .map(resource -> new ResourceValue(resource, ps.sourceLines(resource)))
+                                .sorted(ResourceValue.BY_VALUE_DESCENDING)
+                                .toList();
 
-        Collections.sort(sortedLoC, new ResourceValue());
-        Collections.sort(sortedFiles, new ResourceValue());
+        this.byFiles = resources.stream()
+                                .map(resource -> new ResourceValue(resource, ps.fileCount(resource)))
+                                .sorted(ResourceValue.BY_VALUE_DESCENDING)
+                                .toList();
     }
 
-    public List<ResourceValue> getResourcesByLoc() { return Collections.unmodifiableList(sortedLoC); }
-    public List<ResourceValue> getResourcesByFiles() { return Collections.unmodifiableList(sortedFiles); }
-    
+    public List<ResourceValue> getResourcesByLoc() { return byLines; }
+
+    public List<ResourceValue> getResourcesByFiles() { return byFiles; }
+
     public abstract void produce();
 }

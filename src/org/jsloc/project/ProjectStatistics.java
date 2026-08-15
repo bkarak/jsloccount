@@ -24,115 +24,113 @@
 */
 package org.jsloc.project;
 
-import java.io.File;
-
-import java.util.HashMap;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
+import java.util.function.ToLongFunction;
 
 import org.jsloc.resources.statistics.Statistics;
 
+import static org.jsloc.Configuration.logError;
+import static org.jsloc.Configuration.logWarn;
+
 /**
- * 
- * 
+ * Size metrics for every {@link Resource} found underneath a project directory.
+ *
  * @author Vassilios Karakoidas (bkarak@aueb.gr)
  */
 public class ProjectStatistics {
-    private Map<Resource, LanguageStatistics> stats;
-    private String projectName;
-    
-    public ProjectStatistics(File d) {
-        this.stats = new HashMap<>();
-        this.projectName = d.getName().trim();
-        update(d);
-    } 
-    
-    private void update(File d) {
-        if(d.isDirectory()) {
-            File[] fileList = d.listFiles();
+    private final Map<Resource, LanguageStatistics> stats = new EnumMap<>(Resource.class);
+    private final String projectName;
 
-            if (fileList == null){
-                return;
-            }
+    public ProjectStatistics(Path directory) {
+        Path absolute = directory.toAbsolutePath().normalize();
+        Path name = absolute.getFileName();
 
-            for ( File f : fileList ) {
-                if (f.isHidden()) { continue; }
-                if (f.isDirectory()) { update(f); continue; }
-                
-                Resource l = Resource.detect(f.getAbsolutePath());
-                LanguageStatistics ls;
+        // getFileName() is null for a filesystem root, e.g. "/"
+        this.projectName = (name == null ? absolute.toString() : name.toString()).trim();
+        walk(directory);
+    }
 
-                if(stats.containsKey(l)) {
-                    ls = stats.get(l);
-                } else {
-                    ls = new LanguageStatistics();
-                    stats.put(l, ls);
+    private void walk(Path root) {
+        try {
+            Files.walkFileTree(root, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes) throws IOException {
+                    boolean skip = !directory.equals(root) && Files.isHidden(directory);
+                    return skip ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
                 }
-                
-                ls.noFiles++;
-                if(l.equals(Resource.OTHER)) { continue; }
-                if(l.isBinary()) { continue; }
-                
-                Statistics st = new Statistics(f, l);
-                                
-                ls.loc += st.getLOC();
-                ls.locom += st.getLOCOM();
-                ls.totalLoc += st.getTotalLines();           
-            }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                    if (!Files.isHidden(file)) {
+                        count(file);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException failure) {
+                    // unreadable entries and symlink loops must not abort the whole scan
+                    logWarn("Skipping " + file + " (" + failure.getMessage() + ")");
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException ioe) {
+            logError("Cannot walk " + root + " (" + ioe.getMessage() + ")");
         }
     }
-    
-    public String getProjectName() {
+
+    private void count(Path file) {
+        Resource resource = Resource.detect(file.getFileName().toString());
+        LanguageStatistics languageStatistics = stats.computeIfAbsent(resource, key -> new LanguageStatistics());
+
+        languageStatistics.addFile();
+
+        if (resource == Resource.OTHER || resource.isBinary()) { return; }
+
+        languageStatistics.add(Statistics.count(file, resource));
+    }
+
+    public String projectName() {
         return projectName;
     }
-    
-    public long getLOC(Resource l) {
-        if(stats.containsKey(l)) {
-            return stats.get(l).loc;
-        }
-        
-        return 0;
+
+    public long sourceLines(Resource resource) {
+        return get(resource, LanguageStatistics::sourceLines);
     }
-    
-    public long getLOCOM(Resource l) {
-        if(stats.containsKey(l)) {
-            return stats.get(l).locom;
-        }
-        
-        return 0;
+
+    public long commentLines(Resource resource) {
+        return get(resource, LanguageStatistics::commentLines);
     }
-    
-    public long getTotalLines() {
-        long tloc = 0;
-        
-        for ( Resource l : Resource.values() ) {
-            tloc += getLOC(l);
-        }
-        
-        return tloc;
+
+    public long totalLines(Resource resource) {
+        return get(resource, LanguageStatistics::totalLines);
     }
-    
-    public long getFileCount(Resource l) {
-        if(stats.containsKey(l)) {
-            return stats.get(l).noFiles;
-        }
-        
-        return 0;
+
+    public long fileCount(Resource resource) {
+        return get(resource, LanguageStatistics::fileCount);
     }
-    
-    public long getTotalFileCount() {
-        long totalFiles = 0;
-        
-        for ( Resource l : stats.keySet() ) {
-            totalFiles += getFileCount(l);
-        }
-        
-        return totalFiles;
+
+    public long totalFileCount() {
+        return stats.values().stream().mapToLong(LanguageStatistics::fileCount).sum();
     }
-    
-    public Resource[] getResources() {
-        Set<Resource> resources = stats.keySet();
-        return resources.toArray(new Resource[resources.size()]);
+
+    /** The resources actually present in the project, in {@link Resource} declaration order. */
+    public List<Resource> resources() {
+        return List.copyOf(stats.keySet());
     }
-} 
+
+    private long get(Resource resource, ToLongFunction<LanguageStatistics> field) {
+        LanguageStatistics languageStatistics = stats.get(resource);
+        return languageStatistics == null ? 0 : field.applyAsLong(languageStatistics);
+    }
+}

@@ -1,13 +1,10 @@
 package org.jsloc;
 
+/**
+ * Console logging for the whole tool.
+ */
+public final class Configuration {
 
-public class Configuration {
-    private final static Configuration defaultInstance;
-
-    static {
-        defaultInstance = new Configuration();
-    }
-    
     private Configuration() {}
 
     public static void logError(String msg) {
@@ -20,9 +17,5 @@ public class Configuration {
 
     public static void logWarn(String msg) {
         System.out.println("[WARN] " + msg);
-    }
-    
-    public static Configuration getInstance() {
-        return defaultInstance;
     }
 }

@@ -24,34 +24,26 @@
 */
 package org.jsloc.resources.statistics;
 
+import java.util.Objects;
+
 /**
- * 
- * 
- * @author Vassilios Karakoidas (vassilios.karakoidas@gmail.com)
+ * A comment delimiter pair. A marker whose start and end are identical (for
+ * example {@code //} or {@code #}) comments out the rest of the line.
  *
+ * @author Vassilios Karakoidas (vassilios.karakoidas@gmail.com)
  */
-public class Marker {
-    private final String startingMarker;
-    private final String endingMarker;
-    
-    public Marker(String scm, String ecm) {
-        this.startingMarker = scm;
-        this.endingMarker = ecm;
+public record Marker(String start, String end) {
+
+    public Marker {
+        Objects.requireNonNull(start, "start");
+        Objects.requireNonNull(end, "end");
     }
-    
-    public Marker(String cm) {
-        this(cm, cm);
+
+    public Marker(String marker) {
+        this(marker, marker);
     }
-    
-    public String getStartingMarker() {
-        return startingMarker;
-    }
-    
-    public String getEndingMarker() {
-        return endingMarker;
-    }
-    
-    public boolean isSingleCommentMarker() {
-        return startingMarker.contentEquals(this.endingMarker);
+
+    public boolean isSingleLine() {
+        return start.equals(end);
     }
 }

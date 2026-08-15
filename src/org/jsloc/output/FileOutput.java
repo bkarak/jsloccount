@@ -24,65 +24,62 @@
 */
 package org.jsloc.output;
 
-import org.jsloc.StringUtil;
 import org.jsloc.project.ProjectStatistics;
 import org.jsloc.project.Resource;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.jsloc.Configuration.logError;
 import static org.jsloc.Configuration.logInfo;
 
 /**
- * 
- * 
- * @author Vassilios Karakoidas (bkarak@aueb.gr)
+ * Writes the two CSV reports into the current working directory.
  *
+ * @author Vassilios Karakoidas (bkarak@aueb.gr)
  */
-public class FileOutput extends AbstractOutput{
+public class FileOutput extends AbstractOutput {
+
     public FileOutput(ProjectStatistics ps) {
         super(ps);
     }
 
     @Override
-    public void produce() {        
-        StringBuilder fileStatistics = new StringBuilder(),
-                      sizeStatistics = new StringBuilder();
+    public void produce() {
+        StringBuilder fileStatistics = new StringBuilder("Resource Type,File Count,Total File Count\n");
 
-        fileStatistics.append("Resource Type,File Count,Total File Count\n");
-       
-        for ( ResourceValue lv : this.getResourcesByLoc() ) {
-            if (lv.getResource() == Resource.OTHER) { continue; }
+        for (ResourceValue value : getResourcesByFiles()) {
+            if (value.resource() == Resource.OTHER) { continue; }
 
-            List<String> values = Arrays.asList(lv.getResource().getName(),
-                                                String.valueOf(lv.getValue()),
-                                                String.valueOf(this.projectStatistics.getTotalFileCount()));
-            fileStatistics.append(StringUtil.join(",", values)).append("\n");
+            fileStatistics.append(row(value.resource().displayName(),
+                                      value.value(),
+                                      projectStatistics.totalFileCount()));
         }
 
-        sizeStatistics.append("Resource Type,Source Lines of Code,Comments Lines of Code\n");
+        // getResourcesByLoc() is text-only, so binaries stay out of the size report
+        StringBuilder sizeStatistics = new StringBuilder("Resource Type,Source Lines of Code,Comments Lines of Code\n");
 
-        for ( ResourceValue lv : this.getResourcesByFiles() ) {
-            List<String> values = Arrays.asList(lv.getResource().getName(),
-                                                String.valueOf(lv.getValue()),
-                                                String.valueOf(this.projectStatistics.getLOCOM(lv.getResource())));
-            sizeStatistics.append(StringUtil.join(",", values)).append("\n");
+        for (ResourceValue value : getResourcesByLoc()) {
+            sizeStatistics.append(row(value.resource().displayName(),
+                                      value.value(),
+                                      projectStatistics.commentLines(value.resource())));
         }
 
-        String projectName = this.projectStatistics.getProjectName();
+        String projectName = projectStatistics.projectName();
 
-        this.saveToFile(fileStatistics, projectName + "-filestats.csv");
-        this.saveToFile(sizeStatistics, projectName + "-sizestats.csv");
+        saveToFile(fileStatistics, projectName + "-filestats.csv");
+        saveToFile(sizeStatistics, projectName + "-sizestats.csv");
     }
 
-    private void saveToFile(StringBuilder strbld, String filename) {
+    private static String row(String name, long first, long second) {
+        return String.join(",", name, String.valueOf(first), String.valueOf(second)) + "\n";
+    }
+
+    private static void saveToFile(StringBuilder contents, String filename) {
         try {
-            FileWriter fw = new FileWriter(filename, false);
-            fw.write(strbld.toString());
-            fw.close();
+            Files.writeString(Path.of(filename), contents, StandardCharsets.UTF_8);
             logInfo(filename + " created!");
         } catch (IOException ioe) {
             logError("Failed to create ... " + filename + " (" + ioe.getMessage() + ")");

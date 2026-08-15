@@ -24,172 +24,195 @@
 */
 package org.jsloc.project;
 
+import java.util.List;
+
 import org.jsloc.resources.statistics.Marker;
 
+import static java.util.stream.Collectors.joining;
+
 /**
- * 
- * 
- * @author Vassilios Karakoidas (bkarak@aueb.gr)
+ * Every file type JSLoCCount knows about.
  *
+ * <p>A constant declared with comment markers is a <em>text</em> resource and gets
+ * its lines counted; a constant declared with extensions alone is a <em>binary</em>
+ * resource and only gets its files counted.
+ *
+ * <p>{@link #detect(String)} resolves a filename to the constant owning the longest
+ * matching suffix, so entries whose "extension" is really a whole filename
+ * ({@code build.xml}, {@code Makefile}) win over the plain suffixes they end with,
+ * wherever they are declared. Declaration order only breaks ties between suffixes
+ * of equal length.
+ *
+ * @author Vassilios Karakoidas (bkarak@aueb.gr)
  */
 public enum Resource {
     // text
     // first of all, put the files with full filenames
-    ANT(new Marker[] { new Marker("<!--", "-->") }, new String[] { "build.xml" }, "ANT Build File"),
-    MAKE(new Marker[] { new Marker("#") }, new String[] { "Makefile", ".inc" }, "make"),
+    ANT(List.of(new Marker("<!--", "-->")), List.of("build.xml"), "ANT Build File"),
+    MAKE(List.of(new Marker("#")), List.of("Makefile", ".inc"), "make"),
     // then the rest
-    HASKELL(new Marker[] { new Marker("--") }, new String[] { ".hs"}, "Haskell"),
-    JMOD(new Marker[] {}, new String[] { ".jmod" }, "J%"),
-    JAVA(new Marker[] { new Marker("//"), new Marker("/*", "*/"),  new Marker("/**", "*/") }, new String[] { ".java" }, "Java" ),
-    C(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".c" }, "C" ),
-    CPLUSPLUS(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".C", ".cpp", ".cxx", ".cc" }, "C++"),
-    HEADER(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".h", ".hxx", ".H" }, "C/C++/SWIFT/Objective-c Headers" ),
-    PASCAL(new Marker[] { new Marker("//"), new Marker("{", "}") }, new String[] { ".p", ".pas" }, "Pascal" ),
-    BOURNESHELL(new Marker[] { new Marker("#") }, new String[] { ".sh" }, "Bourne Shell" ),
-    CSHARP(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".cs" }, "C#" ),
-    XML(new Marker[] { new Marker("<!--", "-->") }, new String[] { ".xml" }, "XML" ),
-    HTML(new Marker[] { new Marker("<!--", "-->") }, new String[] { ".htm", ".html" }, "HTML" ),
-    BIBTEX(new Marker[] { new Marker("%") }, new String[] { ".bib" }, "BiBTeX" ),
-    TEX(new Marker[] { new Marker("%") }, new String[] { ".tex", ".cls" }, "TeX/LaTeX" ),
-    PERL(new Marker[] { new Marker("#") }, new String[] { ".pl", ".pm" }, "Perl"),
-    AWK(new Marker[] { new Marker("#") }, new String[] { ".awk" }, "awk" ),
-    OBJECTIVEC(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".m" }, "Objective-C" ),
-    PHP(new Marker[] { new Marker("<!--", "-->"), new Marker("//"), new Marker("#"), new Marker("/*", "*/")}, new String[] { ".php", ".php3", ".php4" }, "PHP"),
-    XSL(new Marker[] { new Marker("<!--", "-->") }, new String[] { ".xsl", ".xslt" }, "XSL/XSLT"),
-    BAT(new Marker[] { new Marker("rem ") }, new String[] { ".bat", ".cmd" }, "MS-Dos/Windows Batch Files" ),
-    XSD(new Marker[] { new Marker("<!--", "-->")}, new String[] { ".xsd", ".xs" }, "X-Schema Files"),
-    DTD(new Marker[] { new Marker("<!--", "-->")}, new String[] { ".dtd", ".mod" }, "Document Type Definition Files" ),
-    SQL(new Marker[] { new Marker("--"), new Marker("/*", "*/") }, new String[] { ".sql" }, "SQL" ),
-    GNUPLOT(new Marker[] { new Marker("#"), }, new String[] { ".plot", ".gnuplot" }, "Gnuplot" ),
-    SED(new Marker[] { new Marker("#") }, new String[] { ".sed" }, "SED" ),
-    TEXT(new Marker[] {}, new String[] { ".txt", ".text"}, "ASCII Text Files"),
-    VISUALSTUDIOPROJECT(new Marker[] { new Marker("<!--","-->") }, new String[] { ".vcproj" }, "Visual Studio Project File"),
-    CSHARPPROJECT(new Marker[] { new Marker("<!--", "-->") }, new String[] { ".csproj" }, "Visual Studio C# Project File" ),
-    RDF(new Marker[] { new Marker("<!--", "-->") }, new String[] { ".rdf" }, "RDF"),
-    WSDL(new Marker[] { new Marker("<!--", "-->") }, new String[] { ".wsdl" }, "WSDL" ),
-    POM(new Marker[] { new Marker("<!--", "-->") }, new String[] { ".pom" }, "Maven POM File"),
-    JSP(new Marker[] { new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/"),  new Marker("/**", "*/") }, new String[] { ".jsp" }, "JSP" ),
-    JAVASCRIPT(new Marker[] { new Marker("//"), new Marker("/*", "*/")}, new String[] { ".js" }, "Javascript" ),
-    CSHELL(new Marker[] { new Marker("#") }, new String[] { ".csh" }, "C-Shell" ),
-    RTF(new Marker[] {}, new String[] { ".rtf" }, "RTF"),
-    PYTHON(new Marker[] { new Marker("#") }, new String[] { ".py" }, "Python"),
-    JAVACC(new Marker[] { new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/") }, new String[] { ".jj" }, "JavaCC Grammar Files"),
-    RUBY(new Marker[] { new Marker("#"), new Marker("=begin", "=end") }, new String[] { ".rb" }, "Ruby"),
-    TCL(new Marker[] { new Marker("#") }, new String[] { ".tcl" }, "TCL"),
-    TCLTK(new Marker[] { new Marker("#") }, new String[] { ".tk" }, "TCL/Tk"),
-    D(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".d" }, "D" ),
-    CMAKE(new Marker[] { new Marker("#"), new Marker("//") }, new String[] { ".cmake" }, "CMake"),
-    SCALA(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".scala" }, "Scala"),
-    FORTRAN(new Marker[] { new Marker("!*") }, new String[] { ".f" }, "Fortran"),
+    HASKELL(List.of(new Marker("--")), List.of(".hs"), "Haskell"),
+    JMOD(List.of(), List.of(".jmod"), "J%"),
+    JAVA(List.of(new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), List.of(".java"), "Java"),
+    C(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".c"), "C"),
+    CPLUSPLUS(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".C", ".cpp", ".cxx", ".cc"), "C++"),
+    HEADER(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".h", ".hxx", ".H"), "C/C++/SWIFT/Objective-c Headers"),
+    PASCAL(List.of(new Marker("//"), new Marker("{", "}")), List.of(".p", ".pas"), "Pascal"),
+    BOURNESHELL(List.of(new Marker("#")), List.of(".sh"), "Bourne Shell"),
+    CSHARP(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".cs"), "C#"),
+    XML(List.of(new Marker("<!--", "-->")), List.of(".xml"), "XML"),
+    HTML(List.of(new Marker("<!--", "-->")), List.of(".htm", ".html"), "HTML"),
+    BIBTEX(List.of(new Marker("%")), List.of(".bib"), "BiBTeX"),
+    TEX(List.of(new Marker("%")), List.of(".tex", ".cls"), "TeX/LaTeX"),
+    PERL(List.of(new Marker("#")), List.of(".pl", ".pm"), "Perl"),
+    AWK(List.of(new Marker("#")), List.of(".awk"), "awk"),
+    OBJECTIVEC(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".m"), "Objective-C"),
+    PHP(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("#"), new Marker("/*", "*/")), List.of(".php", ".php3", ".php4"), "PHP"),
+    XSL(List.of(new Marker("<!--", "-->")), List.of(".xsl", ".xslt"), "XSL/XSLT"),
+    BAT(List.of(new Marker("rem ")), List.of(".bat", ".cmd"), "MS-Dos/Windows Batch Files"),
+    XSD(List.of(new Marker("<!--", "-->")), List.of(".xsd", ".xs"), "X-Schema Files"),
+    DTD(List.of(new Marker("<!--", "-->")), List.of(".dtd", ".mod"), "Document Type Definition Files"),
+    SQL(List.of(new Marker("--"), new Marker("/*", "*/")), List.of(".sql"), "SQL"),
+    GNUPLOT(List.of(new Marker("#")), List.of(".plot", ".gnuplot"), "Gnuplot"),
+    SED(List.of(new Marker("#")), List.of(".sed"), "SED"),
+    TEXT(List.of(), List.of(".txt", ".text"), "ASCII Text Files"),
+    VISUALSTUDIOPROJECT(List.of(new Marker("<!--", "-->")), List.of(".vcproj"), "Visual Studio Project File"),
+    CSHARPPROJECT(List.of(new Marker("<!--", "-->")), List.of(".csproj"), "Visual Studio C# Project File"),
+    RDF(List.of(new Marker("<!--", "-->")), List.of(".rdf"), "RDF"),
+    WSDL(List.of(new Marker("<!--", "-->")), List.of(".wsdl"), "WSDL"),
+    POM(List.of(new Marker("<!--", "-->")), List.of(".pom"), "Maven POM File"),
+    JSP(List.of(new Marker("<!--", "-->"), new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), List.of(".jsp"), "JSP"),
+    JAVASCRIPT(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".js"), "Javascript"),
+    CSHELL(List.of(new Marker("#")), List.of(".csh"), "C-Shell"),
+    RTF(List.of(), List.of(".rtf"), "RTF"),
+    PYTHON(List.of(new Marker("#")), List.of(".py"), "Python"),
+    JAVACC(List.of(new Marker("//"), new Marker("/*", "*/"), new Marker("/**", "*/")), List.of(".jj"), "JavaCC Grammar Files"),
+    RUBY(List.of(new Marker("#"), new Marker("=begin", "=end")), List.of(".rb"), "Ruby"),
+    TCL(List.of(new Marker("#")), List.of(".tcl"), "TCL"),
+    TCLTK(List.of(new Marker("#")), List.of(".tk"), "TCL/Tk"),
+    D(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".d"), "D"),
+    CMAKE(List.of(new Marker("#"), new Marker("//")), List.of(".cmake"), "CMake"),
+    SCALA(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".scala"), "Scala"),
+    FORTRAN(List.of(new Marker("!*")), List.of(".f"), "Fortran"),
     // 2017 additions
-    GO(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".go"}, "Go"),
-    SWIFT(new Marker[] { new Marker("//"), new Marker("/*", "*/") }, new String[] { ".swift"}, "Swift"),
+    GO(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".go"), "Go"),
+    SWIFT(List.of(new Marker("//"), new Marker("/*", "*/")), List.of(".swift"), "Swift"),
     // binary
-    WORD(new String[] { ".doc", ".docx" }, "MS Word Documents"),
-    JPEG(new String[] { ".jpeg", ".jpg" }, "JPEG Images"),
-    GIF(new String[] { ".gif" }, "GIF Images"),
-    PNG(new String[] { ".png" }, "PNG Images"),
-    JAR(new String[] { ".jar" }, "JAR"),
-    TIFF(new String[] { ".tiff", ".tif" }, "TIFF Images"),
-    PSD(new String[] { ".psd" }, "PSD Photoshop Images"),
-    ZIP(new String[] { ".zip" }, "ZIP Archives"),
-    PDF(new String[] { ".pdf" }, "PDF Documents"),
-    GZIP(new String[] { ".gz", ".gzip" }, "GZIP Archives"),
-    BZIP(new String[] { ".bz2", ".bz", ".bzip2", ".bzip"}, "BZIP Archives"),
-    WINHELP(new String[] { ".hlp", ".chm" }, "Windows HELP Files"),
-    RAR(new String[] { ".rar" }, "RAR Archives"),
-    DMG(new String[] { ".dmg", ".pkg" }, "Mac OS X Installation Files"),
-    EXCEL(new String[] { ".xls" }, "Excel Files"),
-    POWERPOINT(new String[] { ".ppt", ".pps" }, "Powerpoint Files"),
-    TAR(new String[] { ".tar" }, "TAR Archives"),
-    TARGZ(new String[] { ".tgz", ".tar.gz" }, "GZIPed TAR Archives"),
-    TARBZ(new String[] { ".tar.bz2" }, "BZIPed TAR Archives" ),
-    RPM(new String[] { ".rpm" }, "RPM Linux Archives"),
-    DEB(new String[] { ".deb" }, "DEB Linux Archives"),
-    ICO(new String[] { ".ico" }, "ICO Images"),
-    DLL(new String[] { ".dll" }, "Win32 Dynamic Linked Library"),
-    UNIXSO(new String[] { ".so" }, "Unix Shared Object"),
-    EXE(new String[] { ".exe"}, "Win32 Executable"),
-    WEBARCHIVE(new String[] { ".war"}, "Java Web Application Archive"),
-    WMF(new String[] { ".wmf" }, "Windows Metafile"),
-    PYC(new String[] { ".pyc" }, "Python Compiled Unit"),
-    MP3(new String[] { ".mp3" }, "MP3 Audio File"),
-    AVI(new String[] { ".avi" }, "Audio-Video File"),
-    DVI(new String[] { ".dvi" }, "Device Independent File Format"),
-    PS(new String[] { ".ps", ".eps" }, "Postscript/Encapsulated Postscript File"),
-    CLASS(new String[] { ".class" }, "Java Compiled Class File"),
-    OBJECTFILE(new String[] { ".o" }, "Object File"),
-    BITMAP(new String[] { ".bmp" }, "Bitmap File"),
-    MP4(new String[] { ".mp4" }, "MP4 Multimedia File"),
+    WORD(List.of(".doc", ".docx"), "MS Word Documents"),
+    JPEG(List.of(".jpeg", ".jpg"), "JPEG Images"),
+    GIF(List.of(".gif"), "GIF Images"),
+    PNG(List.of(".png"), "PNG Images"),
+    JAR(List.of(".jar"), "JAR"),
+    TIFF(List.of(".tiff", ".tif"), "TIFF Images"),
+    PSD(List.of(".psd"), "PSD Photoshop Images"),
+    ZIP(List.of(".zip"), "ZIP Archives"),
+    PDF(List.of(".pdf"), "PDF Documents"),
+    GZIP(List.of(".gz", ".gzip"), "GZIP Archives"),
+    BZIP(List.of(".bz2", ".bz", ".bzip2", ".bzip"), "BZIP Archives"),
+    WINHELP(List.of(".hlp", ".chm"), "Windows HELP Files"),
+    RAR(List.of(".rar"), "RAR Archives"),
+    DMG(List.of(".dmg", ".pkg"), "Mac OS X Installation Files"),
+    EXCEL(List.of(".xls"), "Excel Files"),
+    POWERPOINT(List.of(".ppt", ".pps"), "Powerpoint Files"),
+    TAR(List.of(".tar"), "TAR Archives"),
+    TARGZ(List.of(".tgz", ".tar.gz"), "GZIPed TAR Archives"),
+    TARBZ(List.of(".tar.bz2"), "BZIPed TAR Archives"),
+    RPM(List.of(".rpm"), "RPM Linux Archives"),
+    DEB(List.of(".deb"), "DEB Linux Archives"),
+    ICO(List.of(".ico"), "ICO Images"),
+    DLL(List.of(".dll"), "Win32 Dynamic Linked Library"),
+    UNIXSO(List.of(".so"), "Unix Shared Object"),
+    EXE(List.of(".exe"), "Win32 Executable"),
+    WEBARCHIVE(List.of(".war"), "Java Web Application Archive"),
+    WMF(List.of(".wmf"), "Windows Metafile"),
+    PYC(List.of(".pyc"), "Python Compiled Unit"),
+    MP3(List.of(".mp3"), "MP3 Audio File"),
+    AVI(List.of(".avi"), "Audio-Video File"),
+    DVI(List.of(".dvi"), "Device Independent File Format"),
+    PS(List.of(".ps", ".eps"), "Postscript/Encapsulated Postscript File"),
+    CLASS(List.of(".class"), "Java Compiled Class File"),
+    OBJECTFILE(List.of(".o"), "Object File"),
+    BITMAP(List.of(".bmp"), "Bitmap File"),
+    MP4(List.of(".mp4"), "MP4 Multimedia File"),
     // Other
-    OTHER(new String[] {}, "Other");
-    
-    private Marker[] markers;
-    private String[] extensions;
-    private String name;
-    private boolean isText;
-    
-    private Resource(String[] extensions, String name) {
-        this.markers = new Marker[] {};
-        this.extensions = extensions;
-        this.name = name;
-        this.isText = false;
-    }
-    
-    private Resource(Marker[] markers, String[] extensions, String name) {
-        this.markers = markers;
-        this.extensions = extensions;
-        this.name = name;
-        this.isText = true;
-    }
-    
-    // simple getters
-    
-    public Marker[] getCommentMarkers() { return markers; }
+    OTHER(List.of(), "Other");
 
-    public String[] getExtensions() { return extensions; }
-    
-    public String getName() { return name; }
-    
-    public String toString() {
-        StringBuilder r = new StringBuilder();
-        
-        r.append(name);
-        r.append(" ( ");
-        for ( String s : extensions ) {
-            r.append(s);
-            r.append(", ");
-        }
-        r.append(")");
-        
-        return r.toString(); 
+    private final List<Marker> markers;
+    private final List<String> extensions;
+    private final String name;
+    private final boolean text;
+
+    /** Declares a binary resource: files are counted, lines are not. */
+    Resource(List<String> extensions, String name) {
+        this(List.of(), extensions, name, false);
     }
-    
+
+    /** Declares a text resource, counted with the given comment markers. */
+    Resource(List<Marker> markers, List<String> extensions, String name) {
+        this(markers, extensions, name, true);
+    }
+
+    Resource(List<Marker> markers, List<String> extensions, String name, boolean text) {
+        this.markers = List.copyOf(markers);
+        this.extensions = List.copyOf(extensions);
+        this.name = name;
+        this.text = text;
+    }
+
+    public List<Marker> commentMarkers() {
+        return markers;
+    }
+
+    public List<String> extensions() {
+        return extensions;
+    }
+
+    public String displayName() {
+        return name;
+    }
+
     public boolean isText() {
-        return isText;
+        return text;
     }
-    
+
     public boolean isBinary() {
-        return !isText;
+        return !text;
     }
-    
-    // more complex methods
-    
-    public boolean hasExtension(String fname) {
-        for ( String s : extensions ) {
-            if( fname.endsWith(s) ) { return true; }
+
+    @Override
+    public String toString() {
+        return extensions.stream()
+                         .map(extension -> extension + ", ")
+                         .collect(joining("", name + " ( ", ")"));
+    }
+
+    /** Whether {@code fileName} carries one of this resource's suffixes. Case sensitive: {@code .C} is C++, {@code .c} is C. */
+    public boolean matches(String fileName) {
+        return extensions.stream().anyMatch(fileName::endsWith);
+    }
+
+    /**
+     * The resource owning the longest suffix of {@code fileName}, or {@link #OTHER}
+     * when nothing matches. Longest wins so that a specific suffix beats a shorter
+     * one it ends with: {@code .tar.gz} is a GZIPed TAR archive rather than a plain
+     * GZIP archive, and {@code build.xml} is an ANT build file rather than XML.
+     * Equal-length matches fall to whichever constant is declared first.
+     */
+    public static Resource detect(String fileName) {
+        Resource detected = OTHER;
+        int matched = 0;
+
+        for (Resource resource : values()) {
+            if (resource == OTHER) { continue; }
+
+            for (String extension : resource.extensions) {
+                if (extension.length() > matched && fileName.endsWith(extension)) {
+                    detected = resource;
+                    matched = extension.length();
+                }
+            }
         }
-        
-        return false;
+
+        return detected;
     }
-    
-    public static Resource detect(String fname) {
-        for ( Resource l : values() ) {
-            if ( l == OTHER) { continue; }
-            if ( l.hasExtension(fname) ) { return l; }
-        }
-        
-        return OTHER;
-    }
-    
 }

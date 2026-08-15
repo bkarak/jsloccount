@@ -3,6 +3,15 @@ JSLoCCount - Java Source Line of Code Counter Tool
 
 Calculate physical LoC (Lines of Code) and other code-related size metrics for several languages. In addition, JSLoCCount provides standard file statistics according to file type.
 
+Requirements
+============
+
+Java 21 or newer. Building from source additionally needs Apache Ant:
+
+<pre>
+ant release
+</pre>
+
 Usage
 =====
 
@@ -53,18 +62,19 @@ Supported Languages & Files types
 
 * ANT Build File ( *build.xml*, )
 * make ( *Makefile*, *.inc*, )
-* Java ( *.java*, )
+* Haskell ( *.hs*, )
 * J% ( *.jmod*, )
+* Java ( *.java*, )
 * C ( *.c*, )
 * C++ ( *.C*, *.cpp*, *.cxx*, *.cc*, )
-* C/C++/Obj-C Headers ( *.h*, *.hxx*, *.H*, )
+* C/C++/SWIFT/Objective-c Headers ( *.h*, *.hxx*, *.H*, )
 * Pascal ( *.p*, *.pas*, )
 * Bourne Shell ( *.sh*, )
 * C# ( *.cs*, )
 * XML ( *.xml*, )
 * HTML ( *.htm*, *.html*, )
 * BiBTeX ( *.bib*, )
-* TeX/LaTeX ( *.tex*, )
+* TeX/LaTeX ( *.tex*, *.cls*, )
 * Perl ( *.pl*, *.pm*, )
 * awk ( *.awk*, )
 * Objective-C ( *.m*, )
@@ -94,11 +104,14 @@ Supported Languages & Files types
 * D ( *.d*, )
 * CMake ( *.cmake*, )
 * Scala ( *.scala*, )
+* Fortran ( *.f*, )
+* Go ( *.go*, )
+* Swift ( *.swift*, )
 * MS Word Documents ( *.doc*, *.docx*, )
 * JPEG Images ( *.jpeg*, *.jpg*, )
 * GIF Images ( *.gif*, )
 * PNG Images ( *.png*, )
-* JAR Archive ( *.jar*, )
+* JAR ( *.jar*, )
 * TIFF Images ( *.tiff*, *.tif*, )
 * PSD Photoshop Images ( *.psd*, )
 * ZIP Archives ( *.zip*, )

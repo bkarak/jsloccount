@@ -24,7 +24,9 @@
 */
 package org.jsloc;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 
 import org.jsloc.output.OutputFactory;
 import org.jsloc.project.ProjectStatistics;
@@ -33,37 +35,41 @@ import org.jsloc.project.Resource;
 import static org.jsloc.Configuration.logInfo;
 
 /**
- * 
- * 
  * @author Vassilios Karakoidas (bkarak@aueb.gr)
- *
  */
 public class Main {
-    
+
     private static void help() {
         logInfo("JSLoCcount - Vassilios Karakoidas (bkarak@aueb.gr)\n");
         logInfo("usage:\n");
         logInfo("java -jar jsloccount.jar <directory>\n");
 
         logInfo("Supported Languages:\n");
-        for ( Resource r : Resource.values() ) {
-            logInfo("* " + r.toString());
+        for (Resource resource : Resource.values()) {
+            logInfo("* " + resource);
         }
     }
 
     public static void main(String[] args) {
-        if(args.length == 1) {        
-            File f = new File(args[0]);
-            if(f.exists() && f.isDirectory()) {
-                ProjectStatistics ps = new ProjectStatistics(f);
-                OutputFactory.getFileOutput(ps).produce();
-            } else {
-                logInfo("ERROR: " + f.getAbsolutePath() + " is not a directory");
-            }
-            
+        if (args.length != 1) {
+            help();
             return;
         }
-        
-        help();
+
+        Path directory;
+
+        try {
+            directory = Path.of(args[0]);
+        } catch (InvalidPathException ipe) {
+            logInfo("ERROR: " + args[0] + " is not a valid path");
+            return;
+        }
+
+        if (!Files.isDirectory(directory)) {
+            logInfo("ERROR: " + directory.toAbsolutePath() + " is not a directory");
+            return;
+        }
+
+        OutputFactory.getFileOutput(new ProjectStatistics(directory)).produce();
     }
 }
