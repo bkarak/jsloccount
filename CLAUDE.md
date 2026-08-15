@@ -93,6 +93,6 @@ Deliberately **not** supported, and worth not "fixing" by accident:
 
 - `README.md`'s "Eat Your Own dogfood" section opens with a `Number of Files: … Number of Lines (comments): …` console block. The tool has no such console report — it only writes the two CSVs, which the rest of that section shows correctly. Either the feature was dropped or the docs were aspirational.
 - `Resource.detect` matches whole-filename entries by suffix, so `mybuild.xml` is detected as an ANT build file. Exact-filename matching for entries without a leading dot would tighten this.
-- Lua's long-bracket comments only match `--[[ ]]`; the levelled forms (`--[==[ ]==]`) are not recognized.
+- Lua's long brackets are declared level by level (`[[`, `[=[`, `[==[`, `[===[`) for both comments and strings, which the longest-marker tie-break resolves without any scanner support. **Levels beyond three are not recognized** — reaching them needs content that already holds a `]===]`. Adding level four is one more `Marker` and one more `Quote`; making it unbounded would mean resolving the closing delimiter from the level found at open time, rather than from a fixed string.
 - Vim Script uses `"` for comments *and* for string literals, so `.vim` counts are optimistic. It is listed anyway because `"` genuinely is the comment character.
 - No unit tests at all.

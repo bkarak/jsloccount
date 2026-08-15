@@ -46,4 +46,16 @@ public final class Quotes {
 
     /** Only the single quote, taking no escapes, as in Pascal. */
     public static final List<Quote> SINGLE_RAW = List.of(Quote.raw("'"));
+
+    /**
+     * Lua's ordinary quotes plus its long-bracket strings, whose delimiters carry a
+     * level: {@code [[ ]]}, {@code [=[ ]=]} and so on, the level letting the content
+     * hold any shorter closing sequence. Levels beyond three are not recognized, as
+     * nothing short of deliberately nested generated code reaches them.
+     */
+    public static final List<Quote> LUA = List.of(new Quote("[[", "]]", false, true),
+                                                  new Quote("[=[", "]=]", false, true),
+                                                  new Quote("[==[", "]==]", false, true),
+                                                  new Quote("[===[", "]===]", false, true),
+                                                  Quote.escaped("\""), Quote.escaped("'"));
 }
