@@ -286,6 +286,76 @@ public enum Resource {
         this.text = text;
     }
 
+    /** A broad grouping, used to present the supported types in a readable order. */
+    public enum Category {
+        PROGRAMMING("Programming Languages"),
+        MARKUP("Markup, Data & Configuration"),
+        BUILD("Build & Project Files"),
+        DOCUMENTATION("Documentation & Text"),
+        GRAPHICS("Images, Fonts & Design Assets"),
+        MEDIA("Audio & Video"),
+        ARCHIVE("Archives & Packages"),
+        DOCUMENT("Office Documents"),
+        DATA("Databases, Datasets & Models"),
+        COMPILED("Compiled Artifacts"),
+        OTHER("Other");
+
+        private final String title;
+
+        Category(String title) { this.title = title; }
+
+        public String title() { return title; }
+    }
+
+    /**
+     * The group this type belongs to. Deliberately an exhaustive switch rather than a
+     * constructor argument: a new constant will not compile until it is placed here,
+     * so the grouping cannot silently fall behind the enum.
+     */
+    public Category category() {
+        return switch (this) {
+            case HASKELL, JAVA, C, CPLUSPLUS, HEADER, PASCAL, BOURNESHELL, CSHARP, PERL, AWK,
+                 OBJECTIVEC, PHP, BAT, SQL, GNUPLOT, SED, JSP, JAVASCRIPT, CSHELL, PYTHON,
+                 JAVACC, RUBY, TCL, TCLTK, D, SCALA, FORTRAN, GO, SWIFT, TYPESCRIPT, RUST,
+                 KOTLIN, LUA, DART, ELIXIR, CLOJURE, SCHEME, R, POWERSHELL, ZSH, FISH, GROOVY,
+                 JULIA, ZIG, VUE, SVELTE, ERLANG, OCAML, FSHARP, VISUALBASIC, GRAPHQL,
+                 FORTRANFREE, VIMSCRIPT, QML -> Category.PROGRAMMING;
+
+            case XML, HTML, XSL, XSD, DTD, RDF, WSDL, PROTOBUF, YAML, TOML, JSON, JSONC,
+                 CSS, SASS, TERRAFORM, INI -> Category.MARKUP;
+
+            case ANT, MAKE, VISUALSTUDIOPROJECT, CSHARPPROJECT, POM, CMAKE, DOCKERFILE, NIX,
+                 M4 -> Category.BUILD;
+
+            case BIBTEX, TEX, TEXT, RTF, MARKDOWN, ASCIIDOC, DOCBOOK, MALLARD,
+                 POD -> Category.DOCUMENTATION;
+
+            case JPEG, GIF, PNG, TIFF, PSD, ICO, WMF, BITMAP, SVG, WEBP, AVIF, HEIF, JPEGXL,
+                 TARGA, OPENEXR, DIRECTDRAW, RAWPHOTO, GIMP, ILLUSTRATOR, DESIGNDOCUMENT,
+                 TRUETYPE, OPENTYPE, WEBFONT -> Category.GRAPHICS;
+
+            case MP3, AVI, MP4, WAVE, FLAC, OGG, AAC, WMA, AIFF, MIDI, MATROSKA, QUICKTIME,
+                 MPEGVIDEO, FLASHVIDEO, WMV -> Category.MEDIA;
+
+            case JAR, ZIP, GZIP, BZIP, RAR, DMG, TAR, TARGZ, TARBZ, RPM, DEB, WEBARCHIVE,
+                 SEVENZIP, XZ, ZSTANDARD, TARXZ, TARZSTD, ANDROIDPACKAGE, IOSPACKAGE,
+                 PYTHONPACKAGE, NUGET, LINUXBUNDLE, WINDOWSINSTALLER, DISKIMAGE,
+                 BROWSEREXTENSION, JMOD -> Category.ARCHIVE;
+
+            case WORD, PDF, WINHELP, EXCEL, POWERPOINT, DVI, PS, OPENDOCUMENT, EBOOK, DJVU,
+                 IWORK -> Category.DOCUMENT;
+
+            case SQLITE, DATABASE, PARQUET, AVRO, HDF5, NUMPY, PICKLE, SAFETENSORS, GGUF,
+                 ONNX, PYTORCH, TENSORFLOW, BINARYKEYSTORE, BINARYDATA -> Category.DATA;
+
+            case DLL, UNIXSO, EXE, PYC, CLASS, OBJECTFILE, STATICLIBRARY, DEBUGSYMBOLS,
+                 MACHOLIBRARY, KERNELMODULE, WEBASSEMBLY, BEAM, RUSTLIBRARY, GETTEXT,
+                 QTTRANSLATION -> Category.COMPILED;
+
+            case OTHER -> Category.OTHER;
+        };
+    }
+
     public List<Marker> commentMarkers() {
         return markers;
     }

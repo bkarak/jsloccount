@@ -82,10 +82,18 @@ ANT Build File,24,2
 </pre>
 
 Supported Languages & Files types
-===================
+=================================
 
-* ANT Build File ( *build.xml*, )
-* make ( *Makefile*, *makefile*, *GNUmakefile*, *.inc*, *.mk*, )
+192 file types in ten groups. The first four groups hold the text types, counted for
+source and comment lines and reported in both CSVs. The remaining groups are binary and
+counted by file, so they appear in the file statistics only — the one exception being
+SVG, which is XML and therefore line-counted despite sitting with the images.
+
+Run <i>--list-languages</i> to print this same list from the tool itself.
+
+Programming Languages
+---------------------
+
 * Haskell ( *.hs*, )
 * Java ( *.java*, )
 * C ( *.c*, )
@@ -94,38 +102,23 @@ Supported Languages & Files types
 * Pascal ( *.p*, *.pas*, )
 * Bourne Shell ( *.sh*, *.bash*, *.ksh*, )
 * C# ( *.cs*, )
-* XML ( *.xml*, )
-* HTML ( *.htm*, *.html*, )
-* BiBTeX ( *.bib*, )
-* TeX/LaTeX ( *.tex*, *.cls*, )
 * Perl ( *.pl*, *.pm*, )
 * awk ( *.awk*, )
 * Objective-C ( *.m*, )
 * PHP ( *.php*, *.php3*, *.php4*, )
-* XSL/XSLT ( *.xsl*, *.xslt*, )
 * MS-Dos/Windows Batch Files ( *.bat*, *.cmd*, )
-* X-Schema Files ( *.xsd*, *.xs*, )
-* Document Type Definition Files ( *.dtd*, *.mod*, )
 * SQL ( *.sql*, )
 * Gnuplot ( *.plot*, *.gnuplot*, )
 * SED ( *.sed*, )
-* ASCII Text Files ( *.txt*, *.text*, )
-* Visual Studio Project File ( *.vcproj*, )
-* Visual Studio C# Project File ( *.csproj*, )
-* RDF ( *.rdf*, )
-* WSDL ( *.wsdl*, )
-* Maven POM File ( *.pom*, )
 * JSP ( *.jsp*, )
 * Javascript ( *.js*, *.mjs*, *.cjs*, *.jsx*, )
 * C-Shell ( *.csh*, )
-* RTF ( *.rtf*, )
 * Python ( *.py*, )
 * JavaCC Grammar Files ( *.jj*, )
 * Ruby ( *.rb*, )
 * TCL ( *.tcl*, )
 * TCL/Tk ( *.tk*, )
 * D ( *.d*, )
-* CMake ( *.cmake*, *CMakeLists.txt*, )
 * Scala ( *.scala*, )
 * Fortran (fixed-form) ( *.f*, *.for*, *.f77*, )
 * Go ( *.go*, )
@@ -142,7 +135,6 @@ Supported Languages & Files types
 * PowerShell ( *.ps1*, *.psm1*, *.psd1*, )
 * Z Shell ( *.zsh*, )
 * Fish Shell ( *.fish*, )
-* Protocol Buffers ( *.proto*, )
 * Groovy ( *.groovy*, *.gradle*, )
 * Julia ( *.jl*, )
 * Zig ( *.zig*, )
@@ -155,60 +147,66 @@ Supported Languages & Files types
 * GraphQL ( *.graphql*, *.gql*, )
 * Fortran (free-form) ( *.f90*, *.f95*, *.f03*, *.f08*, )
 * Vim Script ( *.vim*, )
+* QML ( *.qml*, )
+
+Markup, Data & Configuration
+----------------------------
+
+* XML ( *.xml*, )
+* HTML ( *.htm*, *.html*, )
+* XSL/XSLT ( *.xsl*, *.xslt*, )
+* X-Schema Files ( *.xsd*, *.xs*, )
+* Document Type Definition Files ( *.dtd*, *.mod*, )
+* RDF ( *.rdf*, )
+* WSDL ( *.wsdl*, )
+* Protocol Buffers ( *.proto*, )
 * YAML ( *.yml*, *.yaml*, )
 * TOML ( *.toml*, )
 * JSON ( *.json*, )
 * JSON with Comments ( *.jsonc*, *.json5*, )
-* Markdown ( *.md*, *.markdown*, )
 * CSS ( *.css*, )
 * Sass/SCSS/Less ( *.scss*, *.sass*, *.less*, )
-* Dockerfile ( *Dockerfile*, *.dockerfile*, )
 * Terraform/HCL ( *.tf*, *.tfvars*, *.hcl*, )
-* Nix ( *.nix*, )
 * INI/Config Files ( *.ini*, *.cfg*, *.conf*, *.properties*, *.desktop*, )
-* SVG Images ( *.svg*, )
-* AsciiDoc ( *.adoc*, *.asciidoc*, )
-* QML ( *.qml*, )
+
+Build & Project Files
+---------------------
+
+* ANT Build File ( *build.xml*, )
+* make ( *Makefile*, *makefile*, *GNUmakefile*, *.inc*, *.mk*, )
+* Visual Studio Project File ( *.vcproj*, )
+* Visual Studio C# Project File ( *.csproj*, )
+* Maven POM File ( *.pom*, )
+* CMake ( *.cmake*, *CMakeLists.txt*, )
+* Dockerfile ( *Dockerfile*, *.dockerfile*, )
+* Nix ( *.nix*, )
 * M4 Macro Files ( *.m4*, )
+
+Documentation & Text
+--------------------
+
+* BiBTeX ( *.bib*, )
+* TeX/LaTeX ( *.tex*, *.cls*, )
+* ASCII Text Files ( *.txt*, *.text*, )
+* RTF ( *.rtf*, )
+* Markdown ( *.md*, *.markdown*, )
+* AsciiDoc ( *.adoc*, *.asciidoc*, )
 * DocBook Documents ( *.docbook*, )
 * Mallard Help Pages ( *.page*, )
 * Perl POD Documentation ( *.pod*, )
-* MS Word Documents ( *.doc*, *.docx*, )
+
+Images, Fonts & Design Assets
+-----------------------------
+
+* SVG Images ( *.svg*, )
 * JPEG Images ( *.jpeg*, *.jpg*, )
 * GIF Images ( *.gif*, )
 * PNG Images ( *.png*, )
-* JAR ( *.jar*, )
 * TIFF Images ( *.tiff*, *.tif*, )
 * PSD Photoshop Images ( *.psd*, )
-* ZIP Archives ( *.zip*, )
-* PDF Documents ( *.pdf*, )
-* GZIP Archives ( *.gz*, *.gzip*, )
-* BZIP Archives ( *.bz2*, *.bz*, *.bzip2*, *.bzip*, )
-* Windows HELP Files ( *.hlp*, *.chm*, )
-* RAR Archives ( *.rar*, )
-* Mac OS X Installation Files ( *.dmg*, *.pkg*, )
-* Excel Files ( *.xls*, *.xlsx*, )
-* Powerpoint Files ( *.ppt*, *.pps*, *.pptx*, )
-* TAR Archives ( *.tar*, )
-* GZIPed TAR Archives ( *.tgz*, *.tar.gz*, )
-* BZIPed TAR Archives ( *.tar.bz2*, )
-* RPM Linux Archives ( *.rpm*, )
-* DEB Linux Archives ( *.deb*, )
 * ICO Images ( *.ico*, )
-* Win32 Dynamic Linked Library ( *.dll*, )
-* Unix Shared Object ( *.so*, )
-* Win32 Executable ( *.exe*, )
-* Java Web Application Archive ( *.war*, )
 * Windows Metafile ( *.wmf*, )
-* Python Compiled Unit ( *.pyc*, *.pyo*, *.pyd*, )
-* MP3 Audio File ( *.mp3*, )
-* Audio-Video File ( *.avi*, )
-* Device Independent File Format ( *.dvi*, )
-* Postscript/Encapsulated Postscript File ( *.ps*, *.eps*, )
-* Java Compiled Class File ( *.class*, )
-* Object File ( *.o*, *.obj*, )
 * Bitmap File ( *.bmp*, )
-* MP4 Multimedia File ( *.mp4*, )
 * WebP Images ( *.webp*, )
 * AVIF Images ( *.avif*, )
 * HEIF/HEIC Images ( *.heic*, *.heif*, )
@@ -223,6 +221,13 @@ Supported Languages & Files types
 * TrueType Fonts ( *.ttf*, *.ttc*, )
 * OpenType Fonts ( *.otf*, )
 * Web Fonts ( *.woff*, *.woff2*, *.eot*, )
+
+Audio & Video
+-------------
+
+* MP3 Audio File ( *.mp3*, )
+* Audio-Video File ( *.avi*, )
+* MP4 Multimedia File ( *.mp4*, )
 * WAVE Audio ( *.wav*, )
 * FLAC Audio ( *.flac*, )
 * Ogg Audio ( *.ogg*, *.oga*, *.opus*, )
@@ -235,6 +240,22 @@ Supported Languages & Files types
 * MPEG Video ( *.mpg*, *.mpeg*, *.3gp*, )
 * Flash Video ( *.flv*, )
 * Windows Media Video ( *.wmv*, )
+
+Archives & Packages
+-------------------
+
+* JAR ( *.jar*, )
+* ZIP Archives ( *.zip*, )
+* GZIP Archives ( *.gz*, *.gzip*, )
+* BZIP Archives ( *.bz2*, *.bz*, *.bzip2*, *.bzip*, )
+* RAR Archives ( *.rar*, )
+* Mac OS X Installation Files ( *.dmg*, *.pkg*, )
+* TAR Archives ( *.tar*, )
+* GZIPed TAR Archives ( *.tgz*, *.tar.gz*, )
+* BZIPed TAR Archives ( *.tar.bz2*, )
+* RPM Linux Archives ( *.rpm*, )
+* DEB Linux Archives ( *.deb*, )
+* Java Web Application Archive ( *.war*, )
 * 7-Zip Archives ( *.7z*, )
 * XZ Archives ( *.xz*, *.lzma*, )
 * Zstandard Archives ( *.zst*, )
@@ -249,19 +270,25 @@ Supported Languages & Files types
 * Disk Images ( *.iso*, *.img*, *.vhd*, *.qcow2*, )
 * Browser Extensions ( *.crx*, *.xpi*, )
 * Java Module File ( *.jmod*, )
-* Static Libraries ( *.a*, *.lib*, )
-* Debug Symbol Files ( *.pdb*, )
-* Mach-O Dynamic Libraries ( *.dylib*, )
-* Linux Kernel Modules ( *.ko*, )
-* WebAssembly Binaries ( *.wasm*, )
-* Erlang BEAM Files ( *.beam*, )
-* Rust Libraries ( *.rlib*, )
-* Compiled Gettext Catalogs ( *.mo*, )
-* Compiled Qt Translations ( *.qm*, )
+
+Office Documents
+----------------
+
+* MS Word Documents ( *.doc*, *.docx*, )
+* PDF Documents ( *.pdf*, )
+* Windows HELP Files ( *.hlp*, *.chm*, )
+* Excel Files ( *.xls*, *.xlsx*, )
+* Powerpoint Files ( *.ppt*, *.pps*, *.pptx*, )
+* Device Independent File Format ( *.dvi*, )
+* Postscript/Encapsulated Postscript File ( *.ps*, *.eps*, )
 * OpenDocument Files ( *.odt*, *.ods*, *.odp*, )
 * E-Book Files ( *.epub*, *.mobi*, *.azw3*, )
 * DjVu Documents ( *.djvu*, )
 * Apple iWork Documents ( *.pages*, *.numbers*, )
+
+Databases, Datasets & Models
+----------------------------
+
 * SQLite Databases ( *.sqlite*, *.sqlite3*, )
 * Database Files ( *.db*, *.mdb*, *.accdb*, )
 * Apache Parquet Files ( *.parquet*, )
@@ -276,6 +303,25 @@ Supported Languages & Files types
 * TensorFlow Models ( *.tflite*, *.pb*, )
 * Binary Keystores and Certificates ( *.p12*, *.pfx*, *.jks*, *.keystore*, *.der*, )
 * Binary Data Files ( *.bin*, *.dat*, *.pak*, )
+
+Compiled Artifacts
+------------------
+
+* Win32 Dynamic Linked Library ( *.dll*, )
+* Unix Shared Object ( *.so*, )
+* Win32 Executable ( *.exe*, )
+* Python Compiled Unit ( *.pyc*, *.pyo*, *.pyd*, )
+* Java Compiled Class File ( *.class*, )
+* Object File ( *.o*, *.obj*, )
+* Static Libraries ( *.a*, *.lib*, )
+* Debug Symbol Files ( *.pdb*, )
+* Mach-O Dynamic Libraries ( *.dylib*, )
+* Linux Kernel Modules ( *.ko*, )
+* WebAssembly Binaries ( *.wasm*, )
+* Erlang BEAM Files ( *.beam*, )
+* Rust Libraries ( *.rlib*, )
+* Compiled Gettext Catalogs ( *.mo*, )
+* Compiled Qt Translations ( *.qm*, )
 
 License
 =======

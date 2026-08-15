@@ -26,6 +26,7 @@ package org.jsloc;
 
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -115,8 +116,17 @@ public class Main {
     }
 
     private static void listLanguages() {
-        for (Resource resource : Resource.values()) {
-            System.out.println(resource);
+        for (Resource.Category category : Resource.Category.values()) {
+            List<Resource> members = Arrays.stream(Resource.values())
+                                           .filter(resource -> resource != Resource.OTHER)
+                                           .filter(resource -> resource.category() == category)
+                                           .toList();
+
+            if (members.isEmpty()) { continue; }
+
+            System.out.println(category.title());
+            members.forEach(resource -> System.out.println("  " + resource));
+            System.out.println();
         }
     }
 

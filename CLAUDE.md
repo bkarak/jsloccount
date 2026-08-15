@@ -69,6 +69,12 @@ There are no unit tests, so changes here are verified by counting a corpus with 
 
 ### Deciding what to support next
 
+`Resource.category()` groups every type for the README and `--list-languages`. It is an
+**exhaustive switch, not a constructor argument, on purpose**: a new constant will not
+compile until it is placed in a group, so the grouping cannot drift the way a
+hand-maintained list would. Regenerate the README's type list from
+`--list-languages` rather than editing it by hand.
+
 There is a check worth re-running after any batch of additions — it walks every
 declared extension and asserts `Resource.detect` returns the declaring constant,
 which catches one type shadowing another:
