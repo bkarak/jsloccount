@@ -86,8 +86,8 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                 // line inside a block comment leaves the block open
                 if (line.isEmpty()) { continue; }
 
-                // a column-one marker claims the whole raw line before it is trimmed
-                if (openBlock == null && openQuote == null && opensInColumnOne(raw, markers)) {
+                // a positional marker claims the whole line before anything else is read
+                if (openBlock == null && openQuote == null && opensLine(raw, line, markers)) {
                     commentLines++;
                     continue;
                 }
@@ -140,7 +140,7 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                     int start = -1;
 
                     for (Marker marker : markers) {
-                        if (marker.atLineStart()) { continue; }
+                        if (marker.isPositional()) { continue; }
 
                         int index = line.indexOf(marker.start(), position);
                         if (index < 0) { continue; }
@@ -177,9 +177,17 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
                     // whichever opens first decides: a marker inside a literal is not a
                     // comment, and a quote inside a comment is not a literal
                     if (quoting != null && (opening == null || quoted < start)) {
-                        holdsCode = true;
-
                         int end = closesAt(line, quoted + quoting.open().length(), quoting);
+
+                        // a delimiter that never closes was a comment marker all along
+                        if (end < 0 && !quoting.spansLines() && quoting.commentIfUnterminated()) {
+                            holdsCode |= holdsText(line, position, quoted);
+                            holdsComment = true;
+                            position = line.length();
+                            continue;
+                        }
+
+                        holdsCode = true;
 
                         if (end >= 0) {
                             position = end + quoting.close().length();
@@ -243,10 +251,19 @@ public record Statistics(Resource resource, long sourceLines, long commentLines,
         return -1;
     }
 
-    /** Whether an untrimmed line opens with one of the column-one markers. */
-    private static boolean opensInColumnOne(String raw, List<Marker> markers) {
+    /**
+     * Whether a positional marker claims this whole line: a column-one marker against
+     * the untrimmed text, a line-start marker against the trimmed text.
+     */
+    private static boolean opensLine(String raw, String line, List<Marker> markers) {
         for (Marker marker : markers) {
-            if (marker.atLineStart() && raw.startsWith(marker.start())) { return true; }
+            boolean opens = switch (marker.position()) {
+                case COLUMN_ONE -> raw.startsWith(marker.start());
+                case LINE_START -> line.startsWith(marker.start());
+                case ANYWHERE -> false;
+            };
+
+            if (opens) { return true; }
         }
 
         return false;

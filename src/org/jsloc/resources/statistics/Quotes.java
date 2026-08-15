@@ -48,6 +48,13 @@ public final class Quotes {
     public static final List<Quote> SINGLE_RAW = List.of(Quote.raw("'"));
 
     /**
+     * Vim Script, where {@code "} opens a string when it closes on the line and a
+     * comment when it does not. A leading {@code "} is settled earlier still, by the
+     * line-start marker.
+     */
+    public static final List<Quote> VIMSCRIPT = List.of(Quote.stringOrComment("\""), Quote.raw("'"));
+
+    /**
      * Lua's ordinary quotes plus its long-bracket strings, whose delimiters carry a
      * level: {@code [[ ]]}, {@code [=[ ]=]} and so on, the level letting the content
      * hold any shorter closing sequence. Levels beyond three are not recognized, as

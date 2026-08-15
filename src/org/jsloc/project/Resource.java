@@ -124,7 +124,7 @@ public enum Resource {
     VISUALBASIC(List.of(new Marker("'")), Quotes.DOUBLE_RAW, List.of(".vb", ".bas"), "Visual Basic"),
     GRAPHQL(List.of(new Marker("#")), Quotes.DOUBLE_ESCAPED, List.of(".graphql", ".gql"), "GraphQL"),
     FORTRANFREE(List.of(new Marker("!")), Quotes.MARKUP, List.of(".f90", ".f95", ".f03", ".f08"), "Fortran (free-form)"),
-    VIMSCRIPT(List.of(new Marker("\"")), List.of(".vim"), "Vim Script"),
+    VIMSCRIPT(List.of(Marker.atLineStart("\"")), Quotes.VIMSCRIPT, List.of(".vim"), "Vim Script"),
     // 2026 additions: configuration and markup
     YAML(List.of(new Marker("#")), Quotes.SHELL, List.of(".yml", ".yaml"), "YAML"),
     TOML(List.of(new Marker("#")), Quotes.SHELL, List.of(".toml"), "TOML"),
